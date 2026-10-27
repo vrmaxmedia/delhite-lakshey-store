@@ -14,7 +14,7 @@ const CLIENT_CONFIG = {
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
-  logoUrl: "https://raw.githubusercontent.com/vrmaxmedia/delhite-lakshay-store/main/logo.png",
+  logoUrl: "logo.png",
   googleReviewUrl: "https://g.page/r/review",
   mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
@@ -411,7 +411,7 @@ END:VCARD`;
           width: 95px;
           height: 95px;
           border-radius: 50%;
-          background: #1a1a1a;
+          background: #ffffff;
           padding: 4px;
           box-shadow: 0 10px 28px rgba(110, 21, 29, 0.22), 0 4px 10px rgba(0,0,0,0.15);
           display: flex;
@@ -420,6 +420,7 @@ END:VCARD`;
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
           border: 2px solid #d1b183;
+          overflow: hidden;
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
