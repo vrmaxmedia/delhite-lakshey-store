@@ -10,15 +10,16 @@ const CLIENT_CONFIG = {
   description:
     "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified 100% battery health, all variants, and transparent dealing.",
   city: "GTB Nagar, Delhi 110009",
-  fullAddress: "Ground Floor, 1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
+  fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
   logoUrl: "/logo.png",
   googleReviewUrl: "https://g.page/r/review",
-  mapsDirectionUrl: "https://maps.google.com/?q=Ground+floor+1594+Outram+Ln+Outram+Lines+GTB+Nagar+Delhi+110009",
-  instagramUrl: "https://instagram.com/delhitelakshaymobiles",
-  facebookUrl: "https://facebook.com",
+  mapsDirectionUrl: "https://maps.google.com/?q=1594+Outram+Ln+Outram+Lines+GTB+Nagar+Delhi+110009",
+  instagramUrl: "https://www.instagram.com/delhitelakshaymobiles?vrfl=MXNyeDR3MnFjZnB4cQ==",
+  facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
+  youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
   websiteUrl: "https://vrmaxai.in",
   
   customInstruction: "You are an authentic customer writing an unscripted, natural Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real buyer (ranging from college students to working professionals) who just bought an iPhone. Focus on incredible wholesale pricing, mint scratch-less condition, verified 100% battery health, smooth performance, and polite trustworthy dealing by Lakshay bhai's team. Vary the sentence length, tone, and vocabulary organically so it never looks like a template.",
@@ -294,30 +295,37 @@ END:VCARD`;
           <p className="card-disclaimer-note">Please review the wording before posting.</p>
         </div>
 
-        {/* Quick Actions 3D Card with Soft Shadow */}
+        {/* Quick Actions 3D Card with Branded Icons */}
         <div className="quick-actions-card">
           <div className="soft-action-grid">
             <div className="action-row-upper">
+              {/* WhatsApp */}
               <a href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc whatsapp-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                 </div>
                 <span className="icon-tag">WhatsApp</span>
               </a>
+
+              {/* Call Us */}
               <a href={`tel:${CLIENT_CONFIG.phone}`} className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc call-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 </div>
                 <span className="icon-tag">Call Us</span>
               </a>
+
+              {/* Save Contact */}
               <button type="button" onClick={handleSaveContact} className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc contact-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
                 </div>
                 <span className="icon-tag">Save Contact</span>
               </button>
+
+              {/* Directions */}
               <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc map-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                 </div>
                 <span className="icon-tag">Directions</span>
@@ -325,23 +333,28 @@ END:VCARD`;
             </div>
 
             <div className="action-row-lower">
-              <a href={CLIENT_CONFIG.websiteUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                </div>
-                <span className="icon-tag">Website</span>
-              </a>
+              {/* Instagram */}
               <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc insta-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </div>
                 <span className="icon-tag">Instagram</span>
               </a>
+
+              {/* Facebook */}
               <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-                <div className="icon-disc">
+                <div className="icon-disc fb-disc">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
                 </div>
                 <span className="icon-tag">Facebook</span>
+              </a>
+
+              {/* YouTube */}
+              <a href={CLIENT_CONFIG.youtubeUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc yt-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor"/></svg>
+                </div>
+                <span className="icon-tag">YouTube</span>
               </a>
             </div>
           </div>
@@ -691,13 +704,13 @@ END:VCARD`;
         .action-row-upper {
           display: flex;
           justify-content: center;
-          gap: 16px;
+          gap: 14px;
           width: 100%;
         }
         .action-row-lower {
           display: flex;
           justify-content: center;
-          gap: 20px;
+          gap: 18px;
           width: 100%;
         }
         .soft-circle-action {
@@ -717,8 +730,8 @@ END:VCARD`;
           transform: scale(0.92);
         }
         .icon-disc {
-          width: 52px;
-          height: 52px;
+          width: 50px;
+          height: 50px;
           border-radius: 50%;
           background: #fbf7f1;
           display: grid;
@@ -727,19 +740,34 @@ END:VCARD`;
           border: 1px solid #ebd9c3;
           transition: all 0.2s ease;
         }
-        .soft-circle-action:hover .icon-disc {
-          background: #6e151d;
-          border-color: #6e151d;
-        }
-        .soft-circle-action:hover .icon-disc svg {
-          stroke: #ffffff;
-        }
         .icon-disc svg {
           width: 20px;
           height: 20px;
           stroke: #591016;
           transition: stroke 0.2s ease;
         }
+        /* Branded Hover Colors & Accents */
+        .whatsapp-disc:hover { background: #25d366; border-color: #25d366; }
+        .whatsapp-disc:hover svg { stroke: #ffffff; }
+
+        .call-disc:hover { background: #007aff; border-color: #007aff; }
+        .call-disc:hover svg { stroke: #ffffff; }
+
+        .contact-disc:hover { background: #591016; border-color: #591016; }
+        .contact-disc:hover svg { stroke: #ffffff; }
+
+        .map-disc:hover { background: #ea4335; border-color: #ea4335; }
+        .map-disc:hover svg { stroke: #ffffff; }
+
+        .insta-disc:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: transparent; }
+        .insta-disc:hover svg { stroke: #ffffff; }
+
+        .fb-disc:hover { background: #1877f2; border-color: #1877f2; }
+        .fb-disc:hover svg { stroke: #ffffff; }
+
+        .yt-disc:hover { background: #ff0000; border-color: #ff0000; }
+        .yt-disc:hover svg { stroke: #ffffff; color: #ffffff; }
+
         .icon-tag {
           font-size: 9.5px;
           font-weight: 700;
