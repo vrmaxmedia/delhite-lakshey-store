@@ -8,7 +8,7 @@ const CLIENT_CONFIG = {
   subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
   tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
   description:
-    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified 100% battery health, all variants, and transparent dealing.",
+    "Top-rated retail & wholesale iPhone destination in GTB Nagar, Delhi offering premium imported and second-hand Apple devices (iPhone 13, 14, 15, 16, 17 series including Pro & Pro Max) at unbeatable market-best pricing with verified 100% battery health.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
@@ -22,15 +22,15 @@ const CLIENT_CONFIG = {
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. Strictly DO NOT use full stops (.) at the end of sentences to keep it flowing naturally like a real message. Vary the length randomly (some short 2-line reviews, some medium 3-4 line reviews, some detailed). Talk about wholesale pricing, mint phone condition, staff behavior, or store trust using natural conversational words. Never use repetitive robotic openings.",
+  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. NEVER use wholesale in a bulk-selling way; instead talk about getting unbeatable market-best retail prices after checking 10 places. Mention random specific iPhone models organically (e.g. iPhone 15 Pro, iPhone 14, iPhone 16, 13, etc.). Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
 
   chips: [
-    { label: "All", context: "overall store experience, trust, and premium iPhone purchase" },
-    { label: "iPhone 13 to 17", context: "availability of latest models like iPhone 13, 14, 15, 16, 17 in all colors and storage capacities" },
-    { label: "100% Battery Health", context: "getting original battery health, massive backup, and genuine device testing" },
-    { label: "Mint Condition", context: "flawless scratch-less body, unplayed pristine condition, feels completely brand new" },
-    { label: "Wholesale Pricing", context: "unbeatable wholesale rates in Delhi market, total value for money deals" },
-    { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe physical store visit, and friendly staff" }
+    { label: "All", context: "overall store experience, trust, and finding the best deal in Delhi" },
+    { label: "iPhone 13 to 17", context: "buying specific models like iPhone 14, 15 Pro, 16, or 13 series in flawless condition" },
+    { label: "100% Battery Health", context: "getting original 100% battery backup and pristine device testing" },
+    { label: "Mint Condition", context: "scratch-less body, brand-new feel, and unplayed pristine stock" },
+    { label: "Best Market Price", context: "checking 10 different shops across Delhi and finally getting the cheapest, unbeatable price here" },
+    { label: "GTB Nagar Store", context: "visiting Outram Lines store, safe environment, and helpful polite staff" }
   ],
 };
 
@@ -109,8 +109,9 @@ export default function UniversalReviewPage() {
           selectedService: effectiveFocus,
           customInstruction: CLIENT_CONFIG.customInstruction,
           language: lang,
-          nonce: Math.random().toString(36).substring(2, 11),
+          nonce: Math.random().toString(36).substring(2, 12),
           timestamp: Date.now(),
+          randomSeed: Math.floor(Math.random() * 100000),
         }),
       });
 
