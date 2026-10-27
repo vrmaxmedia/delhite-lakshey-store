@@ -8,7 +8,7 @@ const CLIENT_CONFIG = {
   subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
   tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
   description:
-    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified battery health, all variants, and transparent dealing.",
+    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified 100% battery health, all variants, and transparent dealing.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
@@ -16,18 +16,18 @@ const CLIENT_CONFIG = {
   whatsappNumber: "919999652654",
   logoUrl: "/logo.png",
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ8wcMhq_9DDkR-t8xR7HlUg0",
-  mapsDirectionUrl: "https://maps.google.com/?q=1594+Outram+Ln+Outram+Lines+GTB+Nagar+Delhi+110009",
+  mapsDirectionUrl: "https://maps.app.goo.gl/z2ifo3oyCo242aS4A?g_st=ac",
   instagramUrl: "https://www.instagram.com/delhitelakshaymobiles?vrfl=MXNyeDR3MnFjZnB4cQ==",
   facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Strictly avoid starting every review with battery health. Use varied, organic sentence structures. Some reviews should be short (2 lines), some medium (3-4 lines), and some detailed (5-6 lines). Speak naturally about wholesale pricing, store experience, polite staff, phone condition, or store trust. Never repeat phrases or patterns.",
+  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. Strictly DO NOT use full stops (.) at the end of sentences to keep it flowing naturally like a real message. Vary the length randomly (some short 2-line reviews, some medium 3-4 line reviews, some detailed). Talk about wholesale pricing, mint phone condition, staff behavior, or store trust using natural conversational words. Never use repetitive robotic openings.",
 
   chips: [
     { label: "All", context: "overall store experience, trust, and premium iPhone purchase" },
     { label: "iPhone 13 to 17", context: "availability of latest models like iPhone 13, 14, 15, 16, 17 in all colors and storage capacities" },
-    { label: "Battery Health", context: "getting original battery health, massive backup, and genuine device testing" },
+    { label: "100% Battery Health", context: "getting original battery health, massive backup, and genuine device testing" },
     { label: "Mint Condition", context: "flawless scratch-less body, unplayed pristine condition, feels completely brand new" },
     { label: "Wholesale Pricing", context: "unbeatable wholesale rates in Delhi market, total value for money deals" },
     { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe physical store visit, and friendly staff" }
@@ -361,11 +361,13 @@ END:VCARD`;
           </div>
         </div>
 
-        {/* Embedded Map Card with Prominent Full Address */}
+        {/* Embedded Map Card with Address at Top */}
         <div className="embedded-map-card">
           <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
+            <div className="address-highlight-box">
+              <p className="agency-clean-address"><strong>📍 Address:</strong> {CLIENT_CONFIG.fullAddress}</p>
+            </div>
             <div className="map-card-header">
-              <span className="map-pin-icon">📍</span>
               <span>Visit Store • GTB Nagar, Delhi</span>
             </div>
           </a>
@@ -389,10 +391,6 @@ END:VCARD`;
           >
             Get Directions on Google Maps &rarr;
           </a>
-          <div className="address-highlight-box">
-            <p className="agency-clean-address"><strong>Address:</strong> {CLIENT_CONFIG.fullAddress}</p>
-            <p className="agency-clean-phone"><strong>Phone:</strong> {CLIENT_CONFIG.phone}</p>
-          </div>
         </div>
 
         {/* Footer with QR Branding */}
@@ -791,6 +789,7 @@ END:VCARD`;
         .map-card-header {
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 6px;
           font-size: 11.5px;
           font-weight: 800;
@@ -818,15 +817,14 @@ END:VCARD`;
           border-radius: 12px;
           padding: 10px 12px;
           border: 1px solid #ebd9c3;
+          margin-bottom: 8px;
         }
-        .agency-clean-address, .agency-clean-phone {
+        .agency-clean-address {
           font-size: 10.5px;
           color: #554435;
-          margin: 0 0 3px;
-          line-height: 1.4;
-        }
-        .agency-clean-phone {
           margin: 0;
+          line-height: 1.4;
+          text-align: center;
         }
         .page-tail-block {
           width: 100%;
