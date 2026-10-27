@@ -10,7 +10,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "API Key not configured." }, { status: 500 });
     }
 
-    // Mega Anti-Pattern & Length Variation Arrays for Infinite Combinations
     const openingStyles = [
       "bhai kasam se", "yaar sach bolu toh", "socha nahi tha ki", "dus jagah check karne ke baad",
       "pehli baar yaha aaya tha aur", "bhai ekdum maza aa gaya", "agar sach mein badiya deal chahiye toh",
@@ -41,7 +40,8 @@ ULTRA ANTI-PATTERN & LENGTH MANAGEMENT RULES (Entropy ID: ${entropySalt}):
 4. ABSOLUTE ZERO FULL STOPS: Strictly DO NOT use full stops (.) at the end of sentences or anywhere in the review. Keep the text flowing continuously like a real WhatsApp message or casual chat.
 5. LANGUAGE STYLE: Write strictly in ${language}. If Hinglish, use natural Roman Hindi mixed with casual conversational English words, avoiding any formal or robotic phrasing.`;
 
-    const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // Yahan v1beta ki jagah v1 kar diya hai taaki stable model seamlessly load ho jaye
+    const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
