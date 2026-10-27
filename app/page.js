@@ -14,7 +14,7 @@ const CLIENT_CONFIG = {
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
-  logoUrl: "logo.png",
+  logoUrl: "https://raw.githubusercontent.com/vrmaxmedia/delhite-lakshay-store/main/logo.png",
   googleReviewUrl: "https://g.page/r/review",
   mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
