@@ -14,14 +14,14 @@ const CLIENT_CONFIG = {
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
-  logoUrl: "/store-logo.png",
+  logoUrl: "logo.png",
   googleReviewUrl: "https://g.page/r/review",
   mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
   facebookUrl: "https://facebook.com",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Focus purely on buying premium imported or refurbished iPhones ranging from iPhone 13, 14, 15, 16 to iPhone 17 series across all variants. Mention scratch-less mint condition, verified original battery health, best wholesale pricing in Delhi, and trustworthy dealing. Write naturally like a real buyer.",
+  customInstruction: "You are an authentic customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Focus purely on buying premium imported or refurbished iPhones ranging from iPhone 13, 14, 15, 16 to iPhone 17 series across all variants. Mention scratch-less mint condition, verified original battery health (above 85-95%), best wholesale pricing in Delhi, polite staff behavior, and trustworthy dealing. Write naturally like a real buyer from Delhi.",
 
   chips: [
     { label: "All", context: "overall store experience, buying premium iPhones, and trust" },
@@ -34,6 +34,33 @@ const CLIENT_CONFIG = {
   ],
 };
 
+function useTypewriter(fullText, speed = 14) {
+  const [displayText, setDisplayText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (!fullText) {
+      setDisplayText("");
+      setIsTyping(false);
+      return;
+    }
+    setDisplayText("");
+    setIsTyping(true);
+    let index = 0;
+    const timer = setInterval(() => {
+      index++;
+      setDisplayText(fullText.slice(0, index));
+      if (index >= fullText.length) {
+        clearInterval(timer);
+        setIsTyping(false);
+      }
+    }, speed);
+    return () => clearInterval(timer);
+  }, [fullText, speed]);
+
+  return { displayText, isTyping };
+}
+
 export default function UniversalReviewPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedChipObj, setSelectedChipObj] = useState(CLIENT_CONFIG.chips[0]);
@@ -45,6 +72,7 @@ export default function UniversalReviewPage() {
 
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
+  const { displayText, isTyping } = useTypewriter(reviewDraft, 14);
 
   useEffect(() => {
     setMounted(true);
@@ -124,7 +152,7 @@ export default function UniversalReviewPage() {
   }
 
   async function handleCopyAndRedirect() {
-    if (!reviewDraft || loading) return;
+    if (!reviewDraft || loading || isTyping) return;
     try {
       await navigator.clipboard.writeText(reviewDraft);
       setCopied(true);
@@ -227,7 +255,7 @@ END:VCARD`;
             </div>
             <button
               type="button"
-              disabled={loading}
+              disabled={loading || isTyping}
               onClick={() => generateAIReview(selectedChipObj, language)}
               className="top-rewrite-btn"
             >
@@ -239,12 +267,15 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text">Crafting review draft instantly...</span>
+                <span className="shimmer-text">Crafting review draft...</span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
             ) : reviewDraft ? (
-              <p className="review-body-text">{reviewDraft}</p>
+              <p className="review-body-text">
+                {displayText}
+                {isTyping && <span className="typewriter-cursor"></span>}
+              </p>
             ) : (
               <p className="review-placeholder">Your review draft will appear here.</p>
             )}
@@ -254,40 +285,13 @@ END:VCARD`;
 
           <button
             type="button"
-            disabled={loading || !reviewDraft}
+            disabled={loading || isTyping || !reviewDraft}
             onClick={handleCopyAndRedirect}
             className="full-luxury-copy-btn"
           >
             <span>{copied ? "Copied! Opening Google..." : "Copy & Paste on Google"}</span>
           </button>
           <p className="card-disclaimer-note">Please review the wording before posting.</p>
-        </div>
-
-        <div className="embedded-map-card">
-          <div className="map-card-header">
-            <span className="map-pin-icon">📍</span>
-            <span>Visit Store • GTB Nagar, Delhi</span>
-          </div>
-          <div className="map-iframe-container">
-            <iframe
-              title="Delhite Lakshay Store Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13998.8!2d77.206!3d28.706!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zRFTCmiBOYWdhciwgRGVsaGk!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-              width="100%"
-              height="140"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
-          <a
-            href={CLIENT_CONFIG.mapsDirectionUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="map-directions-link"
-          >
-            Get Directions on Google Maps &rarr;
-          </a>
         </div>
 
         <div className="soft-action-grid">
@@ -338,6 +342,33 @@ END:VCARD`;
               <span className="icon-tag">Facebook</span>
             </a>
           </div>
+        </div>
+
+        <div className="embedded-map-card">
+          <div className="map-card-header">
+            <span className="map-pin-icon">📍</span>
+            <span>Visit Store • GTB Nagar, Delhi</span>
+          </div>
+          <div className="map-iframe-container">
+            <iframe
+              title="Delhite Lakshay Store Location"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13998.8!2d77.206!3d28.706!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zRFTCmiBOYWdhciwgRGVsaGk!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              width="100%"
+              height="140"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+          <a
+            href={CLIENT_CONFIG.mapsDirectionUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="map-directions-link"
+          >
+            Get Directions on Google Maps &rarr;
+          </a>
         </div>
 
         <footer className="page-tail-block">
@@ -575,6 +606,19 @@ END:VCARD`;
           font-size: 12px;
           color: #a3212d;
           margin: 0;
+        }
+        .typewriter-cursor {
+          display: inline-block;
+          width: 2px;
+          height: 13px;
+          background: #6e151d;
+          margin-left: 3px;
+          vertical-align: middle;
+          animation: blink 0.7s infinite;
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
         }
         .card-ornament-center {
           text-align: center;
