@@ -1,7 +1,4 @@
-import { NextResponse } from 'next/server';
-
-export async function POST(request) {
-  try {
+try {
     const body = await request.json();
     const { businessName, category, description, city, selectedService, customInstruction, language } = body;
 
@@ -41,7 +38,7 @@ ULTRA ANTI-PATTERN & LENGTH MANAGEMENT RULES (Entropy ID: ${entropySalt}):
 4. ABSOLUTE ZERO FULL STOPS: Strictly DO NOT use full stops (.) at the end of sentences or anywhere in the review. Keep the text flowing continuously like a real WhatsApp message or casual chat.
 5. LANGUAGE STYLE: Write strictly in ${language}. If Hinglish, use natural Roman Hindi mixed with casual conversational English words, avoiding any formal or robotic phrasing.`;
 
-    const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+    const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
