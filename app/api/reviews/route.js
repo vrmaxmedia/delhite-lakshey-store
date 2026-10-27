@@ -1,147 +1,71 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import { GoogleGenAI } from '@google/genai';
 
-export const runtime = "nodejs";
-
-const MODEL = "gemini-3.5-flash-lite";
-
-function clean(value, max = 2000) {
-  return typeof value === "string" ? value.trim().slice(0, max) : "";
-}
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function POST(request) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const body = await request.json();
+    const { businessName, category, description, city, selectedService, customInstruction, language } = body;
 
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured." },
-        { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
-      );
-    }
-
-    let body;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid request body." },
-        { status: 400, headers: { "Cache-Control": "no-store, max-age=0" } }
-      );
-    }
-
-    const businessName = clean(body.businessName, 200);
-    const category = clean(body.category, 200);
-    const description = clean(body.description, 500);
-    const city = clean(body.city, 200);
-    const customInstruction = clean(body.customInstruction, 1000);
-    const language = clean(body.language, 50) || "ENGLISH"; 
-    const selectedService = clean(body.selectedService, 100) || "General Service";
-
-    if (!businessName) {
-      return NextResponse.json(
-        { error: "Business name is required." },
-        { status: 400, headers: { "Cache-Control": "no-store, max-age=0" } }
-      );
-    }
-
-    const humanHooks = [
-      "Style: Start directly with the core experience, product quality, or service satisfaction without any formal intro.",
-      "Style: Start with a personal thought, moment, or visit realization.",
-      "Style: Start with a casual, conversational expression about the utility, pricing, or staff behavior.",
-      "Style: Start by highlighting a specific feature or aspect of the business directly."
+    // Mega Anti-Pattern Dynamic Persona & Phrasing Arrays for Infinite Combinations
+    const openingStyles = [
+      "bhai kasam se", "yaar sach bolu toh", "socha nahi tha ki", "dus jagah check karne ke baad",
+      "pehli baar yaha aaya tha aur", "bhai ekdum maza aa gaya", "agar sach mein badiya deal chahiye toh",
+      "outram lines wale store ka scene", "kasam se aisi dukaan", "market mein sabse hatke",
+      "ghar wale bhi bol rahe the itna saaf phone kaise", "bhai mera experience sach mein ek number raha",
+      "pehle thoda doubt tha par yaha aane ke baad", "kasam se yahan ke alawa ab kahin aur nahi jana"
     ];
-    const chosenHook = humanHooks[Math.floor(Math.random() * humanHooks.length)];
 
-    const lengthRule = "STRICT LENGTH: Write EXACTLY 3 to 4 short sentences maximum (Around 20 to 30 words). Keep it crisp, highly conversational, and unscripted like a real mobile typing session.";
+    const bodyTopics = [
+      "battery health 100 percent mili jo ki socha nahi tha",
+      "iphone 15 pro aur 14 dono ki condition bilkul scratchless thi",
+      "lakshay bhai ka nature aur staff ka behavior bohot polite hai",
+      "market mein 10 jagah ghumne ke baad sabse sasta aur best price yahin mila",
+      "phone bilkul unplayed aur brand-new jaisa lag raha hai",
+      "gtb nagar mein isse badiya shop mobile ke liye koi nahi hai",
+      "pura paisa wasool ho gaya ek bhi fault nahi nikla phone mein"
+    ];
 
-    let languageRule = "";
-    if (language.toUpperCase() === "HINGLISH") {
-      languageRule = "LANGUAGE RULE: Write strictly in natural conversational Hinglish (Hindi-English mix in Latin script) matching the exact casual vibe of local customers (use words like 'ek number', 'paisa wasool', 'mast', 'badiya', 'yaar', 'sach mein').";
-    } else {
-      languageRule = "LANGUAGE RULE: Write strictly in clean, natural, middle-class English. Avoid corporate jargon or robotic templates completely.";
+    const randomOpening = openingStyles[Math.floor(Math.random() * openingStyles.length)];
+    const randomTopic = bodyTopics[Math.floor(Math.random() * bodyTopics.length)];
+    const entropySalt = Math.random().toString(36).substring(2, 15);
+
+    const systemPrompt = `You are an authentic local customer writing an unscripted, highly emotional and organic Google Maps review for ${businessName} located in ${city}.
+Category/Focus: ${category}
+Core Chip Focus: ${selectedService}
+Client Guidelines: ${customInstruction}
+
+MEGA ANTI-PATTERN & RANDOMIZATION RULES (Entropy ID: ${entropySalt}):
+1. UNIQUE OPENING STYLE: Never use a repetitive opening. You can start using a conversational style like "${randomOpening}" or jump directly into the experience organically.
+2. DYNAMIC LENGTH MANAGEMENT: Randomly alter the sentence length and structure on every call. Make some reviews short and punchy (1-2 lines), some medium (3 lines), and some slightly detailed storytelling (4-5 lines).
+3. NATURAL TOPIC BLENDING: Naturally weave in topics like checking multiple shops across Delhi, getting unbeatable retail pricing, 100% original battery health, pristine mint condition, or friendly store staff without following any fixed formula.
+4. ABSOLUTE ZERO FULL STOPS: Strictly DO NOT use full stops (.) at the end of sentences or anywhere in the review. Keep the text flowing continuously like a real WhatsApp message or casual chat.
+5. LANGUAGE STYLE: Write strictly in ${language}. If Hinglish, use natural Roman Hindi mixed with casual conversational English words, avoiding any formal or robotic phrasing.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        { role: 'user', parts: [{ text: `Incorporate random angle hint: "${randomOpening} ... ${randomTopic}". Generate 1 completely unique, unscripted review adhering strictly to all anti-pattern rules. Salt: ${Math.random()}` }] }
+      ],
+      config: {
+        systemInstruction: systemPrompt,
+        temperature: 1.25, // Maximum temperature for ultimate creativity and zero repetition
+        topP: 0.98,
+        maxOutputTokens: 250,
+      }
+    });
+
+    let reviewText = response.text ? response.text.trim() : '';
+
+    // Clean up any trailing full stop to preserve the natural chat flow
+    if (reviewText.endsWith('.')) {
+      reviewText = reviewText.slice(0, -1).trim();
     }
 
-    const uniqueNonce = Math.random().toString(36).substring(2, 10);
-
-    const prompt = `
-[Nonce: ${uniqueNonce}]
-You are an authentic local customer writing an unscripted Google Maps review for a business based strictly on the provided profile details and quality guidelines.
-
-Business Name: "${businessName}"
-Category / Tagline: "${category}"
-Business Description: "${description}"
-Selected Focus / Chip Details: "${selectedService}"
-Location / City: "${city}"
-
-PAGE CUSTOM INSTRUCTION (Strictly follow this specific context):
-"${customInstruction || "Write a genuine customer review based on the business category."}"
-
-${chosenHook}
-${lengthRule}
-${languageRule}
-
-CRITICAL EXECUTION RULES:
-1. NO LOCATION FORCE START: Never start the review sentence forcefully with the city or area name. Let it flow naturally based on the user's experience.
-2. 100% UNIQUE & HUMAN: Ensure zero pattern matching. Every generation must feel like a different real person typing casually from their phone.
-3. RAW OUTPUT ONLY: Return ONLY the raw review text as a plain string. Do NOT use JSON, do NOT use quotes, and do NOT include any headings. Just write the review paragraph directly.
-`;
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 1.95,
-            maxOutputTokens: 95,
-          },
-        }),
-        signal: AbortSignal.timeout(25000),
-      }
-    );
-
-    const responseJson = await response.json().catch(() => ({}));
-    let rawReview = responseJson?.candidates?.[0]?.content?.parts
-      ?.map((part) => part.text || "")
-      .join("")
-      .trim() || "";
-
-    rawReview = rawReview.replace(/^["']|["']$/g, "").trim();
-
-    if (!rawReview) {
-      return NextResponse.json(
-        { error: "No usable draft was returned. Please try again." },
-        { status: 502, headers: { "Cache-Control": "no-store, max-age=0" } }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        review: rawReview,
-        reviews: [rawReview],
-        selectedService,
-      },
-      {
-        headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
-        },
-      }
-    );
+    return NextResponse.json({ review: reviewText });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Something went wrong while generating the draft." },
-      { status: 500, headers: { "Cache-Control": "no-store, max-age=0" } }
-    );
+    console.error("API Review Generation Error:", error);
+    return NextResponse.json({ error: "Failed to generate review draft." }, { status: 500 });
   }
 }
