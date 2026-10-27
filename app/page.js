@@ -8,9 +8,9 @@ const CLIENT_CONFIG = {
   subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
   tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
   description:
-    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified battery health, all variants, and pan-India delivery.",
+    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified 100% battery health, all variants, and transparent dealing.",
   city: "GTB Nagar, Delhi 110009",
-  fullAddress: "Ground floor, 1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
+  fullAddress: "Ground Floor, 1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
@@ -21,20 +21,19 @@ const CLIENT_CONFIG = {
   facebookUrl: "https://facebook.com",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Focus purely on buying premium imported or refurbished iPhones ranging from iPhone 13, 14, 15, 16 to iPhone 17 series across all variants. Mention scratch-less mint condition, verified original battery health (above 85-95%), best wholesale pricing in Delhi, polite staff behavior, and trustworthy dealing. Write naturally like a real buyer from Delhi.",
+  customInstruction: "You are an authentic customer writing an unscripted, natural Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real buyer (ranging from college students to working professionals) who just bought an iPhone. Focus on incredible wholesale pricing, mint scratch-less condition, verified 100% battery health, smooth performance, and polite trustworthy dealing by Lakshay bhai's team. Vary the sentence length, tone, and vocabulary organically so it never looks like a template.",
 
   chips: [
-    { label: "All", context: "overall store experience, buying premium iPhones, and trust" },
-    { label: "iPhone 13 to 17", context: "availability of all models like iPhone 13, 14, 15, 16, 17 in all storage variants and colors" },
-    { label: "Battery Health", context: "original high battery health above 85-95%, long backup, and genuine checking" },
-    { label: "Mint Condition", context: "scratch-less body, unplayed unused stock, flawless performance like a brand new phone" },
-    { label: "Wholesale Pricing", context: "best market rates in Delhi, pocket-friendly second-hand and imported prices, complete value for money" },
-    { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe shopping experience, and great staff behavior" },
-    { label: "Pan-India Delivery", context: "safe prepaid shipping, secure packaging, and trusted delivery across India" }
+    { label: "All", context: "overall store experience, trust, and premium iPhone purchase" },
+    { label: "iPhone 13 to 17", context: "availability of latest models like iPhone 13, 14, 15, 16, 17 in all colors and storage capacities" },
+    { label: "100% Battery Health", context: "getting original 100% battery health, massive backup, and genuine device testing" },
+    { label: "Mint Condition", context: "flawless scratch-less body, unplayed pristine condition, feels completely brand new" },
+    { label: "Wholesale Pricing", context: "unbeatable wholesale rates in Delhi market, total value for money deals" },
+    { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe physical store visit, and friendly staff" }
   ],
 };
 
-function useTypewriter(fullText, speed = 14) {
+function useTypewriter(fullText, speed = 12) {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -72,7 +71,7 @@ export default function UniversalReviewPage() {
 
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 14);
+  const { displayText, isTyping } = useTypewriter(reviewDraft, 12);
 
   useEffect(() => {
     setMounted(true);
@@ -109,7 +108,7 @@ export default function UniversalReviewPage() {
           selectedService: effectiveFocus,
           customInstruction: CLIENT_CONFIG.customInstruction,
           language: lang,
-          nonce: Math.random().toString(36).substring(2, 8),
+          nonce: Math.random().toString(36).substring(2, 9),
         }),
       });
 
@@ -189,6 +188,8 @@ END:VCARD`;
   return (
     <main className="soft-luxury-viewport">
       <div className="main-content-flow">
+        
+        {/* 3D Animated Luxury Logo */}
         <div className="brand-medallion-badge">
           <div 
             className="logo-circle-container" 
@@ -211,6 +212,7 @@ END:VCARD`;
 
         <p className="experience-tracker-title">SHARE YOUR EXPERIENCE</p>
 
+        {/* Filter Chips */}
         <div className="floating-pills-cloud">
           {CLIENT_CONFIG.chips.map((chip) => {
             const active = selectedChipObj.label === chip.label;
@@ -227,6 +229,7 @@ END:VCARD`;
           })}
         </div>
 
+        {/* Language Selector */}
         <div className="capsule-lang-dock">
           {["ENGLISH", "HINGLISH"].map((lang) => {
             const active = language === lang;
@@ -243,6 +246,7 @@ END:VCARD`;
           })}
         </div>
 
+        {/* Review Box */}
         <div className="signature-review-box">
           <div className="box-top-ribbon">
             <div className="label-badge">
@@ -263,7 +267,7 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text">Crafting review draft...</span>
+                <span className="shimmer-text">Crafting authentic review...</span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
@@ -290,7 +294,7 @@ END:VCARD`;
           <p className="card-disclaimer-note">Please review the wording before posting.</p>
         </div>
 
-        {/* Quick Actions Box with Soft Shadow & Spacing */}
+        {/* Quick Actions 3D Card with Soft Shadow */}
         <div className="quick-actions-card">
           <div className="soft-action-grid">
             <div className="action-row-upper">
@@ -343,7 +347,7 @@ END:VCARD`;
           </div>
         </div>
 
-        {/* Embedded Map Card with Full Address & Redirect */}
+        {/* Embedded Map Card with Prominent Full Address */}
         <div className="embedded-map-card">
           <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
             <div className="map-card-header">
@@ -356,7 +360,7 @@ END:VCARD`;
               title="Delhite Lakshay Store Location"
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13998.8!2d77.206!3d28.706!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zRFTCmiBOYWdhciwgRGVsaGk!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
               width="100%"
-              height="140"
+              height="150"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
@@ -371,15 +375,19 @@ END:VCARD`;
           >
             Get Directions on Google Maps &rarr;
           </a>
-          <p className="agency-clean-address">{CLIENT_CONFIG.fullAddress}</p>
+          <div className="address-highlight-box">
+            <p className="agency-clean-address"><strong>Address:</strong> {CLIENT_CONFIG.fullAddress}</p>
+            <p className="agency-clean-phone"><strong>Phone:</strong> {CLIENT_CONFIG.phone}</p>
+          </div>
         </div>
 
+        {/* Footer with QR Branding */}
         <footer className="page-tail-block">
           <p className="tail-hint-note">Review the draft before copying it to Google.</p>
           <div className="agency-bottom-badge">
             Powered by <strong>VR Max AI</strong> •
             <a
-              href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}?text=Hi%20Delhite%20Lakshay%20Store,%20I%20want%20to%20get%20my%20QR%20review%20system%20for%20my%20business.`}
+              href={`https://wa.me/${CLIENT_CONFIG.whatsappNumber}?text=Hi%20VR%20Max%20AI,%20I%20want%20to%20get%20my%20QR%20review%20system%20for%20my%20business.`}
               target="_blank"
               rel="noreferrer"
               className="footer-qr-whatsapp-link"
@@ -394,7 +402,7 @@ END:VCARD`;
         .soft-luxury-viewport {
           min-height: 100vh;
           background: #fbf9f4;
-          padding: 12px 16px 36px;
+          padding: 14px 16px 40px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #2b2016;
@@ -411,33 +419,37 @@ END:VCARD`;
           text-align: center;
         }
         .brand-medallion-badge {
-          margin-top: 14px;
+          margin-top: 12px;
           margin-bottom: 6px;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
         .logo-circle-container {
-          width: 125px;
-          height: 125px;
+          width: 135px;
+          height: 135px;
           border-radius: 50%;
-          background-color: #1a1a1a;
+          background-color: transparent;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 12px 32px rgba(110, 21, 29, 0.28), 0 4px 12px rgba(0,0,0,0.18);
+          box-shadow: 0 14px 34px rgba(110, 21, 29, 0.25), 0 6px 14px rgba(0,0,0,0.12);
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
-          border: 2.5px solid #d1b183;
+          border: 3px solid #d1b183;
+          transition: transform 0.2s ease;
+        }
+        .logo-circle-container:active {
+          transform: scale(0.96);
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
+          50% { transform: translateY(-6px); }
         }
         .brand-main-title {
           font-family: Georgia, serif;
-          font-size: 25px;
-          font-weight: 750;
+          font-size: 26px;
+          font-weight: 800;
           color: #591016;
           margin: 0 0 4px;
           letter-spacing: 0.3px;
@@ -499,6 +511,9 @@ END:VCARD`;
           cursor: pointer;
           box-shadow: 0 2px 8px rgba(180, 155, 130, 0.08);
           transition: all 0.16s ease;
+        }
+        .embossed-pill:active {
+          transform: scale(0.95);
         }
         .embossed-pill.active {
           background: radial-gradient(circle at 30% 30%, #831d27 0%, #591016 100%);
@@ -576,6 +591,10 @@ END:VCARD`;
           font-size: 10.5px;
           font-weight: 650;
           cursor: pointer;
+          transition: transform 0.15s ease;
+        }
+        .top-rewrite-btn:active {
+          transform: scale(0.95);
         }
         .review-display-zone {
           min-height: 80px;
@@ -640,6 +659,10 @@ END:VCARD`;
           font-weight: 750;
           cursor: pointer;
           box-shadow: 0 8px 22px rgba(110, 20, 30, 0.32);
+          transition: transform 0.15s ease;
+        }
+        .full-luxury-copy-btn:active:not(:disabled) {
+          transform: scale(0.98);
         }
         .card-disclaimer-note {
           font-size: 9.5px;
@@ -651,18 +674,18 @@ END:VCARD`;
         .quick-actions-card {
           width: 100%;
           background: #ffffff;
-          border-radius: 20px;
-          padding: 16px 12px;
+          border-radius: 22px;
+          padding: 18px 12px;
           box-sizing: border-box;
           border: 1px solid #ebd9c3;
-          box-shadow: 0 8px 24px rgba(160, 130, 100, 0.12);
+          box-shadow: 0 10px 28px rgba(160, 130, 100, 0.14);
           margin-bottom: 16px;
         }
         .soft-action-grid {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 14px;
+          gap: 16px;
           width: 100%;
         }
         .action-row-upper {
@@ -688,35 +711,48 @@ END:VCARD`;
           border: none;
           cursor: pointer;
           padding: 0;
+          transition: transform 0.15s ease;
+        }
+        .soft-circle-action:active {
+          transform: scale(0.92);
         }
         .icon-disc {
-          width: 48px;
-          height: 48px;
+          width: 52px;
+          height: 52px;
           border-radius: 50%;
           background: #fbf7f1;
           display: grid;
           place-items: center;
-          box-shadow: 0 4px 12px rgba(180, 150, 120, 0.12);
+          box-shadow: 0 6px 16px rgba(180, 150, 120, 0.15);
           border: 1px solid #ebd9c3;
+          transition: all 0.2s ease;
+        }
+        .soft-circle-action:hover .icon-disc {
+          background: #6e151d;
+          border-color: #6e151d;
+        }
+        .soft-circle-action:hover .icon-disc svg {
+          stroke: #ffffff;
         }
         .icon-disc svg {
-          width: 18px;
-          height: 18px;
+          width: 20px;
+          height: 20px;
           stroke: #591016;
+          transition: stroke 0.2s ease;
         }
         .icon-tag {
-          font-size: 9px;
+          font-size: 9.5px;
           font-weight: 700;
           color: #4a3c30;
         }
         .embedded-map-card {
           width: 100%;
           background: #ffffff;
-          border-radius: 20px;
-          padding: 12px 14px;
+          border-radius: 22px;
+          padding: 14px 16px;
           box-sizing: border-box;
           border: 1px solid #ebd9c3;
-          box-shadow: 0 6px 20px rgba(160, 130, 100, 0.08);
+          box-shadow: 0 8px 24px rgba(160, 130, 100, 0.1);
           margin-bottom: 16px;
           text-align: left;
         }
@@ -727,34 +763,41 @@ END:VCARD`;
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 11px;
-          font-weight: 750;
+          font-size: 11.5px;
+          font-weight: 800;
           color: #591016;
           margin-bottom: 8px;
         }
         .map-iframe-container {
           width: 100%;
-          border-radius: 12px;
+          border-radius: 14px;
           overflow: hidden;
           border: 1px solid #ebd9c3;
           margin-bottom: 8px;
         }
         .map-directions-link {
           font-size: 11px;
-          font-weight: 700;
+          font-weight: 750;
           color: #b78a48;
           text-decoration: none;
           display: block;
           text-align: center;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
-        .agency-clean-address {
-          font-size: 10px;
-          color: #7b6b5d;
-          text-align: center;
-          margin: 0;
+        .address-highlight-box {
+          background: #fbf7f1;
+          border-radius: 12px;
+          padding: 10px 12px;
+          border: 1px solid #ebd9c3;
+        }
+        .agency-clean-address, .agency-clean-phone {
+          font-size: 10.5px;
+          color: #554435;
+          margin: 0 0 3px;
           line-height: 1.4;
-          font-style: italic;
+        }
+        .agency-clean-phone {
+          margin: 0;
         }
         .page-tail-block {
           width: 100%;
