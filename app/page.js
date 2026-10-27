@@ -6,9 +6,9 @@ const CLIENT_CONFIG = {
   clientId: "delhite_lakshay_01",
   businessName: "Delhite Lakshay Store",
   subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
-  tagline: "REFURBISHED IPHONES • UNUSED STOCK • BEST DEALS IN DELHI",
+  tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
   description:
-    "Top-rated mobile store in GTB Nagar, Delhi specializing in best-quality second-hand and refurbished iPhones (iPhone 13 to latest models) with verified battery health and pan-India delivery.",
+    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified battery health, all variants, and pan-India delivery.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "Ground floor, 1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
@@ -21,46 +21,18 @@ const CLIENT_CONFIG = {
   facebookUrl: "https://facebook.com",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar. Focus purely on buying a second-hand or refurbished iPhone (like iPhone 13, 14, 15 series), mentioning battery health, scratch-less condition, genuine pricing, and trustworthy dealing. Write naturally like a real buyer from Delhi without any robotic templates.",
+  customInstruction: "You are an authentic customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Focus purely on buying premium imported or refurbished iPhones ranging from iPhone 13, 14, 15, 16 to iPhone 17 series across all variants. Mention scratch-less mint condition, verified original battery health, best wholesale pricing in Delhi, and trustworthy dealing. Write naturally like a real buyer.",
 
   chips: [
-    { label: "All", context: "overall store experience, buying refurbished iPhone, and trust" },
-    { label: "iPhone Quality", context: "scratch-less body, high battery health, genuine parts, and mint condition iPhone" },
-    { label: "Pricing & Deals", context: "best wholesale rates, pocket-friendly second-hand prices, and complete value for money" },
-    { label: "Battery Health", context: "original battery health above 85-90%, long backup, and authentic checking" },
-    { label: "Unused / Refurbished", context: "open box unplayed stock, clean refurbished models, and flawless performance" },
-    { label: "Staff & Service", context: "polite dealing, transparent communication, and helpful staff behavior" },
-    { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe shopping, and great crowd" },
-    { label: "Pan-India Delivery", context: "safe prepaid delivery, fast shipping, and trusted packaging" }
+    { label: "All", context: "overall store experience, buying premium iPhones, and trust" },
+    { label: "iPhone 13 to 17", context: "availability of all models like iPhone 13, 14, 15, 16, 17 in all storage variants and colors" },
+    { label: "Battery Health", context: "original high battery health above 85-95%, long backup, and genuine checking" },
+    { label: "Mint Condition", context: "scratch-less body, unplayed unused stock, flawless performance like a brand new phone" },
+    { label: "Wholesale Pricing", context: "best market rates in Delhi, pocket-friendly second-hand and imported prices, complete value for money" },
+    { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe shopping experience, and great staff behavior" },
+    { label: "Pan-India Delivery", context: "safe prepaid shipping, secure packaging, and trusted delivery across India" }
   ],
 };
-
-function useTypewriter(fullText, speed = 16) {
-  const [displayText, setDisplayText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
-  useEffect(() => {
-    if (!fullText) {
-      setDisplayText("");
-      setIsTyping(false);
-      return;
-    }
-    setDisplayText("");
-    setIsTyping(true);
-    let index = 0;
-    const timer = setInterval(() => {
-      index++;
-      setDisplayText(fullText.slice(0, index));
-      if (index >= fullText.length) {
-        clearInterval(timer);
-        setIsTyping(false);
-      }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [fullText, speed]);
-
-  return { displayText, isTyping };
-}
 
 export default function UniversalReviewPage() {
   const [mounted, setMounted] = useState(false);
@@ -73,7 +45,6 @@ export default function UniversalReviewPage() {
 
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 16);
 
   useEffect(() => {
     setMounted(true);
@@ -153,7 +124,7 @@ export default function UniversalReviewPage() {
   }
 
   async function handleCopyAndRedirect() {
-    if (!reviewDraft || loading || isTyping) return;
+    if (!reviewDraft || loading) return;
     try {
       await navigator.clipboard.writeText(reviewDraft);
       setCopied(true);
@@ -196,6 +167,7 @@ END:VCARD`;
               src={CLIENT_CONFIG.logoUrl}
               alt={CLIENT_CONFIG.businessName}
               className="medallion-logo-img"
+              onError={(e) => { e.target.style.display = 'none'; }}
             />
           </div>
           <h1 className="brand-main-title">{CLIENT_CONFIG.businessName}</h1>
@@ -255,7 +227,7 @@ END:VCARD`;
             </div>
             <button
               type="button"
-              disabled={loading || isTyping}
+              disabled={loading}
               onClick={() => generateAIReview(selectedChipObj, language)}
               className="top-rewrite-btn"
             >
@@ -267,15 +239,12 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text">Crafting review draft...</span>
+                <span className="shimmer-text">Crafting review draft instantly...</span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
             ) : reviewDraft ? (
-              <p className="review-body-text">
-                {displayText}
-                {isTyping && <span className="typewriter-cursor"></span>}
-              </p>
+              <p className="review-body-text">{reviewDraft}</p>
             ) : (
               <p className="review-placeholder">Your review draft will appear here.</p>
             )}
@@ -285,7 +254,7 @@ END:VCARD`;
 
           <button
             type="button"
-            disabled={loading || isTyping || !reviewDraft}
+            disabled={loading || !reviewDraft}
             onClick={handleCopyAndRedirect}
             className="full-luxury-copy-btn"
           >
@@ -606,14 +575,6 @@ END:VCARD`;
           font-size: 12px;
           color: #a3212d;
           margin: 0;
-        }
-        .typewriter-cursor {
-          display: inline-block;
-          width: 2px;
-          height: 13px;
-          background: #6e151d;
-          margin-left: 3px;
-          vertical-align: middle;
         }
         .card-ornament-center {
           text-align: center;
