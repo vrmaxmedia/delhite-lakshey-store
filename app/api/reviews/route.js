@@ -10,7 +10,6 @@ export async function POST(request) {
       return NextResponse.json({ error: "API Key not configured." }, { status: 500 });
     }
 
-    // Mega Anti-Pattern & Length Variation Arrays for Infinite Combinations
     const openingStyles = [
       "bhai kasam se", "yaar sach bolu toh", "socha nahi tha ki", "dus jagah check karne ke baad",
       "pehli baar yaha aaya tha aur", "bhai ekdum maza aa gaya", "agar sach mein badiya deal chahiye toh",
@@ -33,6 +32,8 @@ export async function POST(request) {
 Category/Focus: ${category}
 Core Chip Focus: ${selectedService}
 Client Guidelines: ${customInstruction}
+
+CRITICAL FORMAT RULE: Do not output any internal drafting, mental outline, or thinking steps. Output ONLY the final review text directly and immediately.
 
 ULTRA ANTI-PATTERN & LENGTH MANAGEMENT RULES (Entropy ID: ${entropySalt}):
 1. LENGTH INSTRUCTION FOR THIS GENERATION: ${randomLengthStyle}. You must strictly follow this length constraint so that consecutive reviews never have the same line count.
