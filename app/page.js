@@ -14,7 +14,7 @@ const CLIENT_CONFIG = {
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
-  logoUrl: "/IMG_20261028_000335.png",
+  logoUrl: "/logo.png",
   googleReviewUrl: "https://g.page/r/review",
   mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
@@ -407,6 +407,7 @@ END:VCARD`;
           width: 95px;
           height: 95px;
           border-radius: 50%;
+          background-color: #1a1a1a;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
@@ -689,7 +690,7 @@ END:VCARD`;
           text-align: center;
         }
         .agency-clean-address {
-          format-size: 10px;
+          font-size: 10px;
           color: #6d5e50;
           margin: 0 0 3px;
           line-height: 1.4;
