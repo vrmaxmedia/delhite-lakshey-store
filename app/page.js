@@ -8,26 +8,26 @@ const CLIENT_CONFIG = {
   subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
   tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
   description:
-    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified 100% battery health, all variants, and transparent dealing.",
+    "Top-rated wholesale & retail mobile store in GTB Nagar, Delhi specializing in premium second-hand and imported iPhones (iPhone 13, 14, 15, 16, 17 series) with verified battery health, all variants, and transparent dealing.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
   logoUrl: "/logo.png",
-  googleReviewUrl: "https://g.page/r/review",
+  googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ8wcMhq_9DDkR-t8xR7HlUg0",
   mapsDirectionUrl: "https://maps.google.com/?q=1594+Outram+Ln+Outram+Lines+GTB+Nagar+Delhi+110009",
   instagramUrl: "https://www.instagram.com/delhitelakshaymobiles?vrfl=MXNyeDR3MnFjZnB4cQ==",
   facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
   websiteUrl: "https://vrmaxai.in",
   
-  customInstruction: "You are an authentic customer writing an unscripted, natural Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real buyer (ranging from college students to working professionals) who just bought an iPhone. Focus on incredible wholesale pricing, mint scratch-less condition, verified 100% battery health, smooth performance, and polite trustworthy dealing by Lakshay bhai's team. Vary the sentence length, tone, and vocabulary organically so it never looks like a template.",
+  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Strictly avoid starting every review with battery health. Use varied, organic sentence structures. Some reviews should be short (2 lines), some medium (3-4 lines), and some detailed (5-6 lines). Speak naturally about wholesale pricing, store experience, polite staff, phone condition, or store trust. Never repeat phrases or patterns.",
 
   chips: [
     { label: "All", context: "overall store experience, trust, and premium iPhone purchase" },
     { label: "iPhone 13 to 17", context: "availability of latest models like iPhone 13, 14, 15, 16, 17 in all colors and storage capacities" },
-    { label: "100% Battery Health", context: "getting original 100% battery health, massive backup, and genuine device testing" },
+    { label: "Battery Health", context: "getting original battery health, massive backup, and genuine device testing" },
     { label: "Mint Condition", context: "flawless scratch-less body, unplayed pristine condition, feels completely brand new" },
     { label: "Wholesale Pricing", context: "unbeatable wholesale rates in Delhi market, total value for money deals" },
     { label: "GTB Nagar Store", context: "easy location in Outram Lines GTB Nagar, safe physical store visit, and friendly staff" }
@@ -109,7 +109,8 @@ export default function UniversalReviewPage() {
           selectedService: effectiveFocus,
           customInstruction: CLIENT_CONFIG.customInstruction,
           language: lang,
-          nonce: Math.random().toString(36).substring(2, 9),
+          nonce: Math.random().toString(36).substring(2, 11),
+          timestamp: Date.now(),
         }),
       });
 
