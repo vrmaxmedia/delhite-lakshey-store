@@ -16,7 +16,7 @@ const CLIENT_CONFIG = {
   whatsappNumber: "919999652654",
   logoUrl: "/logo.png",
   googleReviewUrl: "https://g.page/r/review",
-  mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
+  mapsDirectionUrl: "https://maps.google.com/?q=Ground+floor+1594+Outram+Ln+Outram+Lines+GTB+Nagar+Delhi+110009",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
   facebookUrl: "https://facebook.com",
   websiteUrl: "https://vrmaxai.in",
@@ -290,61 +290,67 @@ END:VCARD`;
           <p className="card-disclaimer-note">Please review the wording before posting.</p>
         </div>
 
-        <div className="soft-action-grid">
-          <div className="action-row-upper">
-            <a href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`} target="_blank" rel="noreferrer" className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-              </div>
-              <span className="icon-tag">WhatsApp</span>
-            </a>
-            <a href={`tel:${CLIENT_CONFIG.phone}`} className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              </div>
-              <span className="icon-tag">Call Us</span>
-            </a>
-            <button type="button" onClick={handleSaveContact} className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-              </div>
-              <span className="icon-tag">Save Contact</span>
-            </button>
-            <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <span className="icon-tag">Directions</span>
-            </a>
-          </div>
+        {/* Quick Actions Box with Soft Shadow & Spacing */}
+        <div className="quick-actions-card">
+          <div className="soft-action-grid">
+            <div className="action-row-upper">
+              <a href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </div>
+                <span className="icon-tag">WhatsApp</span>
+              </a>
+              <a href={`tel:${CLIENT_CONFIG.phone}`} className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                </div>
+                <span className="icon-tag">Call Us</span>
+              </a>
+              <button type="button" onClick={handleSaveContact} className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                </div>
+                <span className="icon-tag">Save Contact</span>
+              </button>
+              <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <span className="icon-tag">Directions</span>
+              </a>
+            </div>
 
-          <div className="action-row-lower">
-            <a href={CLIENT_CONFIG.websiteUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              </div>
-              <span className="icon-tag">Website</span>
-            </a>
-            <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-              </div>
-              <span className="icon-tag">Instagram</span>
-            </a>
-            <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
-              <div className="icon-disc">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </div>
-              <span className="icon-tag">Facebook</span>
-            </a>
+            <div className="action-row-lower">
+              <a href={CLIENT_CONFIG.websiteUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <span className="icon-tag">Website</span>
+              </a>
+              <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                </div>
+                <span className="icon-tag">Instagram</span>
+              </a>
+              <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                </div>
+                <span className="icon-tag">Facebook</span>
+              </a>
+            </div>
           </div>
         </div>
 
+        {/* Embedded Map Card with Full Address & Redirect */}
         <div className="embedded-map-card">
-          <div className="map-card-header">
-            <span className="map-pin-icon">📍</span>
-            <span>Visit Store • GTB Nagar, Delhi</span>
-          </div>
+          <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
+            <div className="map-card-header">
+              <span className="map-pin-icon">📍</span>
+              <span>Visit Store • GTB Nagar, Delhi</span>
+            </div>
+          </a>
           <div className="map-iframe-container">
             <iframe
               title="Delhite Lakshay Store Location"
@@ -365,13 +371,21 @@ END:VCARD`;
           >
             Get Directions on Google Maps &rarr;
           </a>
+          <p className="agency-clean-address">{CLIENT_CONFIG.fullAddress}</p>
         </div>
 
         <footer className="page-tail-block">
-          <p className="agency-clean-address">{CLIENT_CONFIG.fullAddress}</p>
           <p className="tail-hint-note">Review the draft before copying it to Google.</p>
           <div className="agency-bottom-badge">
-            Powered by <strong>VR Max AI</strong>
+            Powered by <strong>VR Max AI</strong> •
+            <a
+              href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}?text=Hi%20Delhite%20Lakshay%20Store,%20I%20want%20to%20get%20my%20QR%20review%20system%20for%20my%20business.`}
+              target="_blank"
+              rel="noreferrer"
+              className="footer-qr-whatsapp-link"
+            >
+              Get your QR WhatsApp
+            </a>
           </div>
         </footer>
       </div>
@@ -404,17 +418,17 @@ END:VCARD`;
           align-items: center;
         }
         .logo-circle-container {
-          width: 95px;
-          height: 95px;
+          width: 125px;
+          height: 125px;
           border-radius: 50%;
           background-color: #1a1a1a;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 10px 28px rgba(110, 21, 29, 0.22), 0 4px 10px rgba(0,0,0,0.15);
+          box-shadow: 0 12px 32px rgba(110, 21, 29, 0.28), 0 4px 12px rgba(0,0,0,0.18);
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
-          border: 2px solid #d1b183;
+          border: 2.5px solid #d1b183;
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
@@ -422,7 +436,7 @@ END:VCARD`;
         }
         .brand-main-title {
           font-family: Georgia, serif;
-          font-size: 24px;
+          font-size: 25px;
           font-weight: 750;
           color: #591016;
           margin: 0 0 4px;
@@ -431,7 +445,7 @@ END:VCARD`;
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
-          font-size: 13px;
+          font-size: 13.5px;
           color: #b78a48;
           margin: 0 0 10px;
         }
@@ -634,13 +648,22 @@ END:VCARD`;
           margin: 8px 0 0;
           font-style: italic;
         }
+        .quick-actions-card {
+          width: 100%;
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 16px 12px;
+          box-sizing: border-box;
+          border: 1px solid #ebd9c3;
+          box-shadow: 0 8px 24px rgba(160, 130, 100, 0.12);
+          margin-bottom: 16px;
+        }
         .soft-action-grid {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 12px;
+          gap: 14px;
           width: 100%;
-          margin-bottom: 18px;
         }
         .action-row-upper {
           display: flex;
@@ -667,17 +690,18 @@ END:VCARD`;
           padding: 0;
         }
         .icon-disc {
-          width: 50px;
-          height: 50px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
-          background: #ffffff;
+          background: #fbf7f1;
           display: grid;
           place-items: center;
-          box-shadow: 0 6px 18px rgba(180, 150, 120, 0.15);
+          box-shadow: 0 4px 12px rgba(180, 150, 120, 0.12);
+          border: 1px solid #ebd9c3;
         }
         .icon-disc svg {
-          width: 19px;
-          height: 19px;
+          width: 18px;
+          height: 18px;
           stroke: #591016;
         }
         .icon-tag {
@@ -685,31 +709,78 @@ END:VCARD`;
           font-weight: 700;
           color: #4a3c30;
         }
+        .embedded-map-card {
+          width: 100%;
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 12px 14px;
+          box-sizing: border-box;
+          border: 1px solid #ebd9c3;
+          box-shadow: 0 6px 20px rgba(160, 130, 100, 0.08);
+          margin-bottom: 16px;
+          text-align: left;
+        }
+        .map-card-header-link {
+          text-decoration: none;
+        }
+        .map-card-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 11px;
+          font-weight: 750;
+          color: #591016;
+          margin-bottom: 8px;
+        }
+        .map-iframe-container {
+          width: 100%;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid #ebd9c3;
+          margin-bottom: 8px;
+        }
+        .map-directions-link {
+          font-size: 11px;
+          font-weight: 700;
+          color: #b78a48;
+          text-decoration: none;
+          display: block;
+          text-align: center;
+          margin-bottom: 6px;
+        }
+        .agency-clean-address {
+          font-size: 10px;
+          color: #7b6b5d;
+          text-align: center;
+          margin: 0;
+          line-height: 1.4;
+          font-style: italic;
+        }
         .page-tail-block {
           width: 100%;
           text-align: center;
         }
-        .agency-clean-address {
-          font-size: 10px;
-          color: #6d5e50;
-          margin: 0 0 3px;
-          line-height: 1.4;
-        }
         .tail-hint-note {
           font-size: 9.5px;
           color: #9c8e80;
-          margin: 0 0 8px;
+          margin: 0 0 6px;
         }
         .agency-bottom-badge {
-          font-size: 8px;
+          font-size: 8.5px;
           color: #9c8e80;
           letter-spacing: 0.4px;
           text-transform: uppercase;
           border-top: 1px solid #ebd9c3;
-          padding-top: 6px;
+          padding-top: 8px;
         }
         .agency-bottom-badge strong {
           color: #7b1c24;
+        }
+        .footer-qr-whatsapp-link {
+          color: #7b1c24;
+          text-decoration: underline;
+          font-weight: 700;
+          margin-left: 4px;
         }
       `}</style>
     </main>
