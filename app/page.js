@@ -14,7 +14,7 @@ const CLIENT_CONFIG = {
   phone: "+919999652654",
   cleanPhone: "919999652654",
   whatsappNumber: "919999652654",
-  logoUrl: "https://raw.githubusercontent.com/vrmaxmedia/delhite-lakshay-store/main/logo.png",
+  logoUrl: "/IMG_20261028_000335.png",
   googleReviewUrl: "https://g.page/r/review",
   mapsDirectionUrl: "https://maps.google.com/?q=Delhite+Lakshay+Store+GTB+Nagar+Delhi",
   instagramUrl: "https://instagram.com/delhitelakshaymobiles",
@@ -190,14 +190,10 @@ END:VCARD`;
     <main className="soft-luxury-viewport">
       <div className="main-content-flow">
         <div className="brand-medallion-badge">
-          <div className="logo-circle-container">
-            <img
-              src={CLIENT_CONFIG.logoUrl}
-              alt={CLIENT_CONFIG.businessName}
-              className="medallion-logo-img"
-              onError={(e) => { e.target.style.display = 'none'; }}
-            />
-          </div>
+          <div 
+            className="logo-circle-container" 
+            style={{ backgroundImage: `url(${CLIENT_CONFIG.logoUrl})` }}
+          ></div>
           <h1 className="brand-main-title">{CLIENT_CONFIG.businessName}</h1>
         </div>
 
@@ -411,26 +407,17 @@ END:VCARD`;
           width: 95px;
           height: 95px;
           border-radius: 50%;
-          background: #ffffff;
-          padding: 4px;
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
           box-shadow: 0 10px 28px rgba(110, 21, 29, 0.22), 0 4px 10px rgba(0,0,0,0.15);
-          display: flex;
-          align-items: center;
-          justify-content: center;
           margin-bottom: 12px;
           animation: floatLogo 3.5s ease-in-out infinite;
           border: 2px solid #d1b183;
-          overflow: hidden;
         }
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-5px); }
-        }
-        .medallion-logo-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 50%;
         }
         .brand-main-title {
           font-family: Georgia, serif;
@@ -646,41 +633,6 @@ END:VCARD`;
           margin: 8px 0 0;
           font-style: italic;
         }
-        .embedded-map-card {
-          width: 100%;
-          background: #ffffff;
-          border-radius: 20px;
-          padding: 10px 12px;
-          box-sizing: border-box;
-          border: 1px solid #ebd9c3;
-          box-shadow: 0 6px 20px rgba(160, 130, 100, 0.08);
-          margin-bottom: 16px;
-          text-align: left;
-        }
-        .map-card-header {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 10.5px;
-          font-weight: 750;
-          color: #591016;
-          margin-bottom: 6px;
-        }
-        .map-iframe-container {
-          width: 100%;
-          border-radius: 10px;
-          overflow: hidden;
-          border: 1px solid #ebd9c3;
-          margin-bottom: 6px;
-        }
-        .map-directions-link {
-          font-size: 10.5px;
-          font-weight: 700;
-          color: #b78a48;
-          text-decoration: none;
-          display: block;
-          text-align: center;
-        }
         .soft-action-grid {
           display: flex;
           flex-direction: column;
@@ -737,7 +689,7 @@ END:VCARD`;
           text-align: center;
         }
         .agency-clean-address {
-          font-size: 10px;
+          format-size: 10px;
           color: #6d5e50;
           margin: 0 0 3px;
           line-height: 1.4;
