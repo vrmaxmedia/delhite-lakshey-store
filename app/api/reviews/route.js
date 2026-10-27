@@ -19,9 +19,8 @@ export async function POST(request) {
     ];
 
     const lengthDirectives = [
-      "Keep this review very short, crisp and punchy (strictly 1 to 2 short lines only, like a quick casual text)",
-      "Keep this review medium-sized (around 3 lines covering the experience and price naturally)",
-      "Make this review slightly detailed and descriptive with natural storytelling (4 to 5 lines covering checking multiple shops and store trust)"
+      "Keep this review concise, natural, and complete (around 2 to 3 lines covering the experience naturally without cutting off)",
+      "Make this review detailed and descriptive with natural storytelling (4 to 5 lines covering checking multiple shops and store trust completely)"
     ];
 
     const randomOpening = openingStyles[Math.floor(Math.random() * openingStyles.length)];
@@ -33,29 +32,31 @@ Category/Focus: ${category}
 Core Chip Focus: ${selectedService}
 Client Guidelines: ${customInstruction}
 
-CRITICAL FORMAT RULE: Do not output any internal drafting, mental outline, or thinking steps. Output ONLY the final review text directly and immediately.
+CRITICAL RULES:
+1. Do not output any internal drafting, mental outline, or thinking steps. Output ONLY the final review text directly and immediately.
+2. Ensure the review is fully complete and finished naturally. Never cut off mid-sentence.
 
-ULTRA ANTI-PATTERN & LENGTH MANAGEMENT RULES (Entropy ID: ${entropySalt}):
-1. LENGTH INSTRUCTION FOR THIS GENERATION: ${randomLengthStyle}. You must strictly follow this length constraint so that consecutive reviews never have the same line count.
-2. UNIQUE OPENING STYLE: Never use a repetitive opening. You can start using a conversational hook like "${randomOpening}" or jump directly into the experience organically.
-3. NATURAL TOPIC BLENDING: Naturally weave in topics like checking multiple shops across Delhi, getting unbeatable retail pricing, 100% original battery health, pristine mint condition, or friendly store staff without following any fixed formula.
+RULES (Entropy ID: ${entropySalt}):
+1. LENGTH INSTRUCTION: ${randomLengthStyle}.
+2. UNIQUE OPENING STYLE: Start using a conversational hook like "${randomOpening}" or jump directly into the experience organically.
+3. NATURAL TOPIC BLENDING: Naturally weave in topics like checking multiple shops across Delhi, getting unbeatable retail pricing, 100% original battery health, pristine mint condition, or friendly store staff.
 4. ABSOLUTE ZERO FULL STOPS: Strictly DO NOT use full stops (.) at the end of sentences or anywhere in the review. Keep the text flowing continuously like a real WhatsApp message or casual chat.
-5. LANGUAGE STYLE: Write strictly in ${language}. If Hinglish, use natural Roman Hindi mixed with casual conversational English words, avoiding any formal or robotic phrasing.`;
+5. LANGUAGE STYLE: Write strictly in ${language}. If Hinglish, use natural Roman Hindi mixed with casual conversational English words.`;
 
     const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [
-          { role: 'user', parts: [{ text: `Generate 1 completely unique, unscripted review adhering strictly to all anti-pattern and length rules. Salt: ${Math.random()}` }] }
+          { role: 'user', parts: [{ text: `Generate 1 completely unique, unscripted, and fully complete review adhering strictly to all rules. Salt: ${Math.random()}` }] }
         ],
         systemInstruction: {
           parts: [{ text: systemPrompt }]
         },
         generationConfig: {
-          temperature: 1.3,
-          topP: 0.99,
-          maxOutputTokens: 250,
+          temperature: 0.8, // Balanced temperature to prevent cutting off
+          topP: 0.95,
+          maxOutputTokens: 300,
         }
       })
     });
