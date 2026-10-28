@@ -439,39 +439,16 @@ END:VCARD`;
           </a>
         </div>
 
-        {/* Premium Footer: VR Max AI */}
-        <footer className="page-tail-block">
-          <div className="agency-footer-card">
-            <div className="agency-footer-top">
-              <span className="agency-powered">POWERED BY</span>
-              <span className="agency-name">{CLIENT_CONFIG.agencyName}</span>
-            </div>
-
-            <p className="agency-pitch">
-              Want a QR review system like this for your own business?
-              <br />
-              More 5-star Google reviews, in just one scan.
-            </p>
-
-            <a
-              href={AGENCY_WA_LINK}
-              target="_blank"
-              rel="noreferrer"
-              className="agency-wa-btn"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="agency-wa-icon">
-                <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.2-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.2 4.23-9.44 9.44-9.44a9.38 9.38 0 0 1 6.67 2.77 9.38 9.38 0 0 1 2.76 6.68c0 5.2-4.24 9.45-9.39 9.45zm8.04-17.5A11.3 11.3 0 0 0 12.05.7C5.83.7.78 5.75.78 11.97c0 1.99.52 3.93 1.51 5.64L.7 23.3l5.82-1.53a11.27 11.27 0 0 0 5.53 1.41h.01c6.22 0 11.28-5.06 11.28-11.28 0-3.01-1.17-5.84-3.3-7.97z"/>
-              </svg>
-              <span className="agency-wa-text">
-                <span className="agency-wa-title">Get Your QR on WhatsApp</span>
-                <span className="agency-wa-number">{CLIENT_CONFIG.agencyPhoneDisplay}</span>
-              </span>
+        {/* Mini Footer */}
+        <footer className="mini-footer">
+          <span className="mini-footer-pill">
+            Powered by <strong>{CLIENT_CONFIG.agencyName}</strong>
+            <span className="mini-footer-dot">•</span>
+            Get QR:
+            <a href={AGENCY_WA_LINK} target="_blank" rel="noreferrer">
+              {CLIENT_CONFIG.agencyPhoneDisplay}
             </a>
-
-            <a href={`tel:+${CLIENT_CONFIG.agencyWhatsapp}`} className="agency-call-link">
-              or call us: {CLIENT_CONFIG.agencyPhoneDisplay}
-            </a>
-          </div>
+          </span>
         </footer>
       </div>
 
@@ -479,7 +456,7 @@ END:VCARD`;
         .soft-luxury-viewport {
           min-height: 100vh;
           background: #fbf9f4;
-          padding: 14px 16px 40px;
+          padding: 14px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #2b2016;
@@ -524,7 +501,7 @@ END:VCARD`;
           50% { transform: translateY(-6px); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .logo-circle-container, .agency-wa-btn { animation: none; }
+          .logo-circle-container { animation: none; }
         }
         .brand-main-title {
           font-family: Georgia, serif;
@@ -851,7 +828,7 @@ END:VCARD`;
           box-sizing: border-box;
           border: 1px solid #ebd9c3;
           box-shadow: 0 8px 24px rgba(160, 130, 100, 0.1);
-          margin-bottom: 18px;
+          margin-bottom: 12px;
           text-align: left;
         }
         .map-card-header-link {
@@ -898,102 +875,39 @@ END:VCARD`;
           text-align: center;
         }
 
-        /* ---------- Premium Footer ---------- */
-        .page-tail-block {
+        /* ---------- Mini Footer ---------- */
+        .mini-footer {
           width: 100%;
-          text-align: center;
-        }
-        .agency-footer-card {
-          width: 100%;
-          box-sizing: border-box;
-          background: linear-gradient(160deg, #1b1210 0%, #2b1a16 55%, #3a1a1f 100%);
-          border: 1px solid #d1b183;
-          border-radius: 22px;
-          padding: 18px 16px 16px;
-          box-shadow: 0 14px 34px rgba(60, 20, 25, 0.28);
           display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
+          justify-content: center;
+          margin-top: 2px;
         }
-        .agency-footer-top {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2px;
-        }
-        .agency-powered {
-          font-size: 8px;
-          letter-spacing: 2.4px;
-          color: #b9a58a;
-          font-weight: 700;
-        }
-        .agency-name {
-          font-family: Georgia, serif;
-          font-size: 20px;
-          font-weight: 800;
-          letter-spacing: 0.6px;
-          background: linear-gradient(90deg, #f1d9a0, #d1b183, #f1d9a0);
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-        .agency-pitch {
-          margin: 0;
-          font-size: 11px;
-          line-height: 1.55;
-          color: #e6d9c6;
-        }
-        .agency-wa-btn {
-          width: 100%;
-          box-sizing: border-box;
-          display: flex;
+        .mini-footer-pill {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 12px;
-          padding: 12px 16px;
+          flex-wrap: wrap;
+          gap: 4px;
+          padding: 5px 12px;
+          border: 1px solid #ebd9c3;
           border-radius: 999px;
-          background: linear-gradient(180deg, #2fd16f 0%, #1faa55 100%);
-          color: #ffffff;
-          text-decoration: none !important;
-          box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35);
-          transition: transform 0.15s ease;
-          animation: waPulse 2.6s ease-in-out infinite;
-        }
-        .agency-wa-btn:active {
-          transform: scale(0.97);
-        }
-        @keyframes waPulse {
-          0%, 100% { box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35); }
-          50% { box-shadow: 0 8px 28px rgba(37, 211, 102, 0.6); }
-        }
-        .agency-wa-icon {
-          width: 26px;
-          height: 26px;
-          flex-shrink: 0;
-        }
-        .agency-wa-text {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          line-height: 1.25;
-        }
-        .agency-wa-title {
-          font-size: 13px;
-          font-weight: 800;
-        }
-        .agency-wa-number {
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.6px;
-          opacity: 0.95;
-        }
-        .agency-call-link {
-          font-size: 10.5px;
-          color: #d1b183;
-          text-decoration: none;
-          font-weight: 600;
+          background: #ffffff;
+          font-size: 8.5px;
           letter-spacing: 0.3px;
+          color: #9c8e80;
+          line-height: 1.4;
+        }
+        .mini-footer-pill strong {
+          color: #7b1c24;
+          font-weight: 700;
+        }
+        .mini-footer-dot {
+          color: #d1b183;
+        }
+        .mini-footer-pill a {
+          color: #7b1c24;
+          font-weight: 700;
+          text-decoration: none;
         }
       `}</style>
     </main>
