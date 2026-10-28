@@ -13,16 +13,20 @@ const CLIENT_CONFIG = {
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
   cleanPhone: "919999652654",
-  whatsappNumber: "919999652654",
   logoUrl: "/logo.png",
   googleReviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ8wcMhq_9DDkR-t8xR7HlUg0",
   mapsDirectionUrl: "https://maps.app.goo.gl/z2ifo3oyCo242aS4A?g_st=ac",
   instagramUrl: "https://www.instagram.com/delhitelakshaymobiles?vrfl=MXNyeDR3MnFjZnB4cQ==",
   facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
-  websiteUrl: "https://vrmaxai.in",
-  
-  customInstruction: "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. NEVER use wholesale in a bulk-selling way; instead talk about getting unbeatable market-best retail prices after checking 10 places. Mention random specific iPhone models organically (e.g. iPhone 15 Pro, iPhone 14, iPhone 16, 13, etc.). Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
+
+  // VR Max AI (agency) contact
+  agencyName: "VR Max AI",
+  agencyWhatsapp: "918700660097",
+  agencyPhoneDisplay: "+91 87006 60097",
+
+  customInstruction:
+    "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. NEVER use wholesale in a bulk-selling way; instead talk about getting unbeatable market-best retail prices after checking 10 places. Mention random specific iPhone models organically (e.g. iPhone 15 Pro, iPhone 14, iPhone 16, 13, etc.). Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
 
   chips: [
     { label: "All", context: "overall store experience, trust, and finding the best deal in Delhi" },
@@ -30,11 +34,19 @@ const CLIENT_CONFIG = {
     { label: "100% Battery Health", context: "getting original 100% battery backup and pristine device testing" },
     { label: "Mint Condition", context: "scratch-less body, brand-new feel, and unplayed pristine stock" },
     { label: "Best Market Price", context: "checking 10 different shops across Delhi and finally getting the cheapest, unbeatable price here" },
-    { label: "GTB Nagar Store", context: "visiting Outram Lines store, safe environment, and helpful polite staff" }
+    { label: "GTB Nagar Store", context: "visiting Outram Lines store, safe environment, and helpful polite staff" },
   ],
 };
 
-function useTypewriter(fullText, speed = 12) {
+const MAP_EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(
+  `Delhite Lakshay Store, ${CLIENT_CONFIG.fullAddress}`
+)}&output=embed`;
+
+const AGENCY_WA_LINK = `https://wa.me/${CLIENT_CONFIG.agencyWhatsapp}?text=${encodeURIComponent(
+  "Hi VR Max AI, I want to get a QR review system for my business."
+)}`;
+
+function useTypewriter(fullText, speed = 10) {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -61,6 +73,32 @@ function useTypewriter(fullText, speed = 12) {
   return { displayText, isTyping };
 }
 
+async function copyToClipboard(text) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (e) {
+    // fallback neeche
+  }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function UniversalReviewPage() {
   const [mounted, setMounted] = useState(false);
   const [selectedChipObj, setSelectedChipObj] = useState(CLIENT_CONFIG.chips[0]);
@@ -72,7 +110,8 @@ export default function UniversalReviewPage() {
 
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 12);
+  const recentLengthsRef = useRef([]);
+  const { displayText, isTyping } = useTypewriter(reviewDraft, 10);
 
   useEffect(() => {
     setMounted(true);
@@ -112,6 +151,7 @@ export default function UniversalReviewPage() {
           nonce: Math.random().toString(36).substring(2, 12),
           timestamp: Date.now(),
           randomSeed: Math.floor(Math.random() * 100000),
+          recentLengths: recentLengthsRef.current,
         }),
       });
 
@@ -120,6 +160,9 @@ export default function UniversalReviewPage() {
       if (!data.review?.trim()) throw new Error("The API returned an empty draft.");
       if (requestId !== requestIdRef.current) return;
 
+      if (data.meta) {
+        recentLengthsRef.current = [...recentLengthsRef.current, data.meta].slice(-6);
+      }
       setReviewDraft(data.review.trim());
     } catch (err) {
       if (err.name === "AbortError") return;
@@ -155,24 +198,25 @@ export default function UniversalReviewPage() {
 
   async function handleCopyAndRedirect() {
     if (!reviewDraft || loading || isTyping) return;
-    try {
-      await navigator.clipboard.writeText(reviewDraft);
-      setCopied(true);
-      setTimeout(() => {
-        window.location.href = CLIENT_CONFIG.googleReviewUrl;
-      }, 550);
-    } catch (err) {
-      setError("Could not copy the draft.");
+    const ok = await copyToClipboard(reviewDraft);
+    if (!ok) {
+      setError("Could not copy the draft. Please select and copy it manually.");
+      return;
     }
+    setCopied(true);
+    setTimeout(() => {
+      window.location.href = CLIENT_CONFIG.googleReviewUrl;
+    }, 550);
   }
 
   function handleSaveContact() {
     const vcard = `BEGIN:VCARD
 VERSION:3.0
 FN:${CLIENT_CONFIG.businessName}
-TEL:${CLIENT_CONFIG.phone}
-ADR:;;${CLIENT_CONFIG.city};;;;
-NOTE:Trusted Apple iPhone Wholesaler & Retailer
+ORG:${CLIENT_CONFIG.businessName}
+TEL;TYPE=CELL:${CLIENT_CONFIG.phone}
+ADR;TYPE=WORK:;;${CLIENT_CONFIG.fullAddress};;;;
+NOTE:${CLIENT_CONFIG.subHeading}
 END:VCARD`;
 
     const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" });
@@ -191,12 +235,13 @@ END:VCARD`;
   return (
     <main className="soft-luxury-viewport">
       <div className="main-content-flow">
-        
-        {/* 3D Animated Luxury Logo */}
+        {/* Logo */}
         <div className="brand-medallion-badge">
-          <div 
-            className="logo-circle-container" 
+          <div
+            className="logo-circle-container"
             style={{ backgroundImage: `url(${CLIENT_CONFIG.logoUrl})` }}
+            role="img"
+            aria-label={`${CLIENT_CONFIG.businessName} logo`}
           ></div>
           <h1 className="brand-main-title">{CLIENT_CONFIG.businessName}</h1>
         </div>
@@ -209,7 +254,7 @@ END:VCARD`;
           <span className="divider-line"></span>
         </div>
 
-        <div className="stars-cluster">
+        <div className="stars-cluster" aria-hidden="true">
           <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
         </div>
 
@@ -270,7 +315,7 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text">Crafting authentic review...</span>
+                <span className="shimmer-text"> Crafting authentic review...</span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
@@ -297,7 +342,7 @@ END:VCARD`;
           <p className="card-disclaimer-note">Please review the wording before posting.</p>
         </div>
 
-        {/* Quick Actions 3D Card with Branded Icons */}
+        {/* Quick Actions */}
         <div className="quick-actions-card">
           <div className="soft-action-grid">
             <div className="action-row-upper">
@@ -362,7 +407,7 @@ END:VCARD`;
           </div>
         </div>
 
-        {/* Embedded Map Card with Address at Top */}
+        {/* Map Card */}
         <div className="embedded-map-card">
           <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
             <div className="address-highlight-box">
@@ -375,9 +420,9 @@ END:VCARD`;
           <div className="map-iframe-container">
             <iframe
               title="Delhite Lakshay Store Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13998.8!2d77.206!3d28.706!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zRFTCmiBOYWdhciwgRGVsaGk!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+              src={MAP_EMBED_URL}
               width="100%"
-              height="150"
+              height="170"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
@@ -394,18 +439,37 @@ END:VCARD`;
           </a>
         </div>
 
-        {/* Footer with QR Branding */}
+        {/* Premium Footer: VR Max AI */}
         <footer className="page-tail-block">
-          <p className="tail-hint-note">Review the draft before copying it to Google.</p>
-          <div className="agency-bottom-badge">
-            Powered by <strong>VR Max AI</strong> •
+          <div className="agency-footer-card">
+            <div className="agency-footer-top">
+              <span className="agency-powered">POWERED BY</span>
+              <span className="agency-name">{CLIENT_CONFIG.agencyName}</span>
+            </div>
+
+            <p className="agency-pitch">
+              Want a QR review system like this for your own business?
+              <br />
+              More 5-star Google reviews, in just one scan.
+            </p>
+
             <a
-              href={`https://wa.me/${CLIENT_CONFIG.whatsappNumber}?text=Hi%20VR%20Max%20AI,%20I%20want%20to%20get%20my%20QR%20review%20system%20for%20my%20business.`}
+              href={AGENCY_WA_LINK}
               target="_blank"
               rel="noreferrer"
-              className="footer-qr-whatsapp-link"
+              className="agency-wa-btn"
             >
-              Get your QR WhatsApp
+              <svg viewBox="0 0 24 24" fill="currentColor" className="agency-wa-icon">
+                <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zM12.05 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.2-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.2 4.23-9.44 9.44-9.44a9.38 9.38 0 0 1 6.67 2.77 9.38 9.38 0 0 1 2.76 6.68c0 5.2-4.24 9.45-9.39 9.45zm8.04-17.5A11.3 11.3 0 0 0 12.05.7C5.83.7.78 5.75.78 11.97c0 1.99.52 3.93 1.51 5.64L.7 23.3l5.82-1.53a11.27 11.27 0 0 0 5.53 1.41h.01c6.22 0 11.28-5.06 11.28-11.28 0-3.01-1.17-5.84-3.3-7.97z"/>
+              </svg>
+              <span className="agency-wa-text">
+                <span className="agency-wa-title">Get Your QR on WhatsApp</span>
+                <span className="agency-wa-number">{CLIENT_CONFIG.agencyPhoneDisplay}</span>
+              </span>
+            </a>
+
+            <a href={`tel:+${CLIENT_CONFIG.agencyWhatsapp}`} className="agency-call-link">
+              or call us: {CLIENT_CONFIG.agencyPhoneDisplay}
             </a>
           </div>
         </footer>
@@ -458,6 +522,9 @@ END:VCARD`;
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .logo-circle-container, .agency-wa-btn { animation: none; }
         }
         .brand-main-title {
           font-family: Georgia, serif;
@@ -674,6 +741,10 @@ END:VCARD`;
           box-shadow: 0 8px 22px rgba(110, 20, 30, 0.32);
           transition: transform 0.15s ease;
         }
+        .full-luxury-copy-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
         .full-luxury-copy-btn:active:not(:disabled) {
           transform: scale(0.98);
         }
@@ -746,7 +817,6 @@ END:VCARD`;
           stroke: #591016;
           transition: stroke 0.2s ease;
         }
-        /* Branded Hover Colors & Accents */
         .whatsapp-disc:hover { background: #25d366; border-color: #25d366; }
         .whatsapp-disc:hover svg { stroke: #ffffff; }
 
@@ -781,7 +851,7 @@ END:VCARD`;
           box-sizing: border-box;
           border: 1px solid #ebd9c3;
           box-shadow: 0 8px 24px rgba(160, 130, 100, 0.1);
-          margin-bottom: 16px;
+          margin-bottom: 18px;
           text-align: left;
         }
         .map-card-header-link {
@@ -827,31 +897,103 @@ END:VCARD`;
           line-height: 1.4;
           text-align: center;
         }
+
+        /* ---------- Premium Footer ---------- */
         .page-tail-block {
           width: 100%;
           text-align: center;
         }
-        .tail-hint-note {
-          font-size: 9.5px;
-          color: #9c8e80;
-          margin: 0 0 6px;
+        .agency-footer-card {
+          width: 100%;
+          box-sizing: border-box;
+          background: linear-gradient(160deg, #1b1210 0%, #2b1a16 55%, #3a1a1f 100%);
+          border: 1px solid #d1b183;
+          border-radius: 22px;
+          padding: 18px 16px 16px;
+          box-shadow: 0 14px 34px rgba(60, 20, 25, 0.28);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
         }
-        .agency-bottom-badge {
-          font-size: 8.5px;
-          color: #9c8e80;
-          letter-spacing: 0.4px;
-          text-transform: uppercase;
-          border-top: 1px solid #ebd9c3;
-          padding-top: 8px;
+        .agency-footer-top {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
         }
-        .agency-bottom-badge strong {
-          color: #7b1c24;
-        }
-        .footer-qr-whatsapp-link {
-          color: #7b1c24;
-          text-decoration: underline;
+        .agency-powered {
+          font-size: 8px;
+          letter-spacing: 2.4px;
+          color: #b9a58a;
           font-weight: 700;
-          margin-left: 4px;
+        }
+        .agency-name {
+          font-family: Georgia, serif;
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: 0.6px;
+          background: linear-gradient(90deg, #f1d9a0, #d1b183, #f1d9a0);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        }
+        .agency-pitch {
+          margin: 0;
+          font-size: 11px;
+          line-height: 1.55;
+          color: #e6d9c6;
+        }
+        .agency-wa-btn {
+          width: 100%;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          padding: 12px 16px;
+          border-radius: 999px;
+          background: linear-gradient(180deg, #2fd16f 0%, #1faa55 100%);
+          color: #ffffff;
+          text-decoration: none !important;
+          box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35);
+          transition: transform 0.15s ease;
+          animation: waPulse 2.6s ease-in-out infinite;
+        }
+        .agency-wa-btn:active {
+          transform: scale(0.97);
+        }
+        @keyframes waPulse {
+          0%, 100% { box-shadow: 0 8px 22px rgba(37, 211, 102, 0.35); }
+          50% { box-shadow: 0 8px 28px rgba(37, 211, 102, 0.6); }
+        }
+        .agency-wa-icon {
+          width: 26px;
+          height: 26px;
+          flex-shrink: 0;
+        }
+        .agency-wa-text {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          line-height: 1.25;
+        }
+        .agency-wa-title {
+          font-size: 13px;
+          font-weight: 800;
+        }
+        .agency-wa-number {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.6px;
+          opacity: 0.95;
+        }
+        .agency-call-link {
+          font-size: 10.5px;
+          color: #d1b183;
+          text-decoration: none;
+          font-weight: 600;
+          letter-spacing: 0.3px;
         }
       `}</style>
     </main>
