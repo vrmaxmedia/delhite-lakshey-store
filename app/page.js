@@ -19,6 +19,7 @@ const CLIENT_CONFIG = {
   instagramUrl: "https://www.instagram.com/delhitelakshaymobiles?vrfl=MXNyeDR3MnFjZnB4cQ==",
   facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
+  whatsappChannelUrl: "https://whatsapp.com/channel/0029Va5ABfF4IBhEZhHx2N3w",
 
   // VR Max AI (agency) contact
   agencyName: "VR Max AI",
@@ -386,6 +387,14 @@ END:VCARD`;
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </div>
                 <span className="icon-tag">Instagram</span>
+              </a>
+
+              {/* WhatsApp Channel */}
+              <a href={CLIENT_CONFIG.whatsappChannelUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+                <div className="icon-disc wa-channel-disc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <span className="icon-tag">WA Channel</span>
               </a>
 
               {/* Facebook */}
@@ -758,7 +767,7 @@ END:VCARD`;
         .action-row-lower {
           display: flex;
           justify-content: center;
-          gap: 18px;
+          gap: 14px;
           width: 100%;
         }
         .soft-circle-action {
@@ -808,6 +817,9 @@ END:VCARD`;
 
         .insta-disc:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: transparent; }
         .insta-disc:hover svg { stroke: #ffffff; }
+
+        .wa-channel-disc:hover { background: #25d366; border-color: #25d366; }
+        .wa-channel-disc:hover svg { stroke: #ffffff; }
 
         .fb-disc:hover { background: #1877f2; border-color: #1877f2; }
         .fb-disc:hover svg { stroke: #ffffff; }
