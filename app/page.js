@@ -5,10 +5,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 const CLIENT_CONFIG = {
   clientId: "delhite_lakshay_01",
   businessName: "Delhite Lakshay Store",
-  subHeading: "Trusted Apple iPhone Wholesaler & Retailer",
-  tagline: "IPHONE 13 TO 17 • UNUSED & REFURBISHED STOCK • BEST DEALS IN DELHI",
+  subHeading: "Trusted Refurbished & Unused Apple iPhone Specialist",
+  tagline: "REFURBISHED & UNUSED IPHONE 13 TO 17 • BEST DEALS IN DELHI",
   description:
-    "Top-rated retail & wholesale iPhone destination in GTB Nagar, Delhi offering premium imported and second-hand Apple devices (iPhone 13, 14, 15, 16, 17 series including Pro & Pro Max) at unbeatable market-best pricing with verified 100% battery health.",
+    "Trusted refurbished and unused iPhone specialist in GTB Nagar, Delhi offering premium imported and second-hand Apple iPhones (iPhone 13, 14, 15, 16, 17 series including Pro & Pro Max) at fair market pricing with verified 100% battery health.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
@@ -30,12 +30,19 @@ const CLIENT_CONFIG = {
     "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. NEVER use wholesale in a bulk-selling way; instead talk about getting unbeatable market-best retail prices after checking 10 places. Mention random specific iPhone models organically (e.g. iPhone 15 Pro, iPhone 14, iPhone 16, 13, etc.). Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
 
   chips: [
-    { label: "All", context: "overall store experience, trust, and finding the best deal in Delhi" },
-    { label: "iPhone 13 to 17", context: "buying specific models like iPhone 14, 15 Pro, 16, or 13 series in flawless condition" },
-    { label: "100% Battery Health", context: "getting original 100% battery backup and pristine device testing" },
-    { label: "Mint Condition", context: "scratch-less body, brand-new feel, and unplayed pristine stock" },
-    { label: "Best Market Price", context: "checking 10 different shops across Delhi and finally getting the cheapest, unbeatable price here" },
-    { label: "GTB Nagar Store", context: "visiting Outram Lines store, safe environment, and helpful polite staff" },
+    { label: "All", context: "overall store experience" },
+    { label: "Refurbished iPhone", context: "refurbished iPhone that looks and works like new" },
+    { label: "Unused iPhone", context: "unused fresh piece iPhone" },
+    { label: "iPhone 13 & 14", context: "iPhone 13 or iPhone 14 in budget" },
+    { label: "iPhone 15 Series", context: "iPhone 15, 15 Pro or 15 Pro Max" },
+    { label: "iPhone 16 & 17", context: "latest iPhone 16 or iPhone 17" },
+    { label: "100% Battery Health", context: "100% battery health shown and checked" },
+    { label: "Mint Condition", context: "clean body, no scratches, mint condition" },
+    { label: "Best Price", context: "fair best price without hidden charges" },
+    { label: "Genuine Bill & Box", context: "genuine bill and box, trust" },
+    { label: "Camera & Screen Tested", context: "camera, screen and every function tested before buying" },
+    { label: "Honest Advice", context: "honest guidance and polite staff, no pressure" },
+    { label: "GTB Nagar Store", context: "easy to find store near GTB Nagar metro, Outram Lines" },
   ],
 };
 
@@ -47,7 +54,7 @@ const AGENCY_WA_LINK = `https://wa.me/${CLIENT_CONFIG.agencyWhatsapp}?text=${enc
   "Hi VR Max AI, I want to get a QR review system for my business."
 )}`;
 
-function useTypewriter(fullText, speed = 12, step = 4) {
+function useTypewriter(fullText, totalMs = 2300) {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -59,17 +66,36 @@ function useTypewriter(fullText, speed = 12, step = 4) {
     }
     setDisplayText("");
     setIsTyping(true);
-    let index = 0;
-    const timer = setInterval(() => {
-      index += step;
-      setDisplayText(fullText.slice(0, index));
-      if (index >= fullText.length) {
-        clearInterval(timer);
+
+    // Har akshar ka time: chhota review thoda dheere, lamba thoda tez (total ~2.3 sec)
+    // Comma par halka sa pause, taaki insaan jaisa likha hua lage
+    const COMMA_PAUSE = 90;
+    const commas = (fullText.match(/,/g) || []).length;
+    const base = Math.min(26, Math.max(10, (totalMs - commas * COMMA_PAUSE) / fullText.length));
+    const times = [];
+    let t = 0;
+    for (let i = 0; i < fullText.length; i++) {
+      t += base;
+      times.push(t);
+      if (fullText[i] === ",") t += COMMA_PAUSE;
+    }
+
+    const start = performance.now();
+    let raf;
+    const tick = (now) => {
+      const elapsed = now - start;
+      let n = 0;
+      while (n < times.length && times[n] <= elapsed) n++;
+      setDisplayText(fullText.slice(0, n));
+      if (n >= fullText.length) {
         setIsTyping(false);
+      } else {
+        raf = requestAnimationFrame(tick);
       }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [fullText, speed, step]);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [fullText, totalMs]);
 
   return { displayText, isTyping };
 }
@@ -102,7 +128,8 @@ async function copyToClipboard(text) {
 
 export default function UniversalReviewPage() {
   const [mounted, setMounted] = useState(false);
-  const [selectedChipObj, setSelectedChipObj] = useState(CLIENT_CONFIG.chips[0]);
+  const [selectedLabels, setSelectedLabels] = useState(["All"]);
+  const firstRunRef = useRef(true);
   const [language, setLanguage] = useState("ENGLISH");
   const [reviewDraft, setReviewDraft] = useState("");
   const [loading, setLoading] = useState(false);
@@ -112,7 +139,7 @@ export default function UniversalReviewPage() {
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
   const recentLengthsRef = useRef([]);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 12, 4);
+  const { displayText, isTyping } = useTypewriter(reviewDraft);
 
   useEffect(() => {
     setMounted(true);
@@ -122,7 +149,7 @@ export default function UniversalReviewPage() {
     };
   }, []);
 
-  const generateAIReview = useCallback(async (chipObj, lang) => {
+  const generateAIReview = useCallback(async (labels, lang) => {
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -134,7 +161,7 @@ export default function UniversalReviewPage() {
     setReviewDraft("");
 
     try {
-      const effectiveFocus = `${chipObj.label} (Context cues: ${chipObj.context})`;
+      const effectiveFocus = labels.join(" + ");
 
       const res = await fetch("/api/reviews", {
         method: "POST",
@@ -147,6 +174,7 @@ export default function UniversalReviewPage() {
           description: CLIENT_CONFIG.description,
           city: CLIENT_CONFIG.city,
           selectedService: effectiveFocus,
+          selectedChips: labels,
           customInstruction: CLIENT_CONFIG.customInstruction,
           language: lang,
           nonce: Math.random().toString(36).substring(2, 12),
@@ -177,21 +205,39 @@ export default function UniversalReviewPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    generateAIReview(selectedChipObj, language);
-    return () => abortControllerRef.current?.abort();
-  }, [mounted, selectedChipObj, language, generateAIReview]);
+    // Chips jaldi-jaldi dabane par har tap par Gemini call na ho, isliye thoda ruk kar
+    const delay = firstRunRef.current ? 0 : 350;
+    firstRunRef.current = false;
+    const t = setTimeout(() => generateAIReview(selectedLabels, language), delay);
+    return () => {
+      clearTimeout(t);
+      abortControllerRef.current?.abort();
+    };
+  }, [mounted, selectedLabels, language, generateAIReview]);
 
+  // Chips = keywords. 3 tak chun sakte hain. "All" akela chalta hai.
   function handleChipChange(chipObj) {
-    if (chipObj.label === selectedChipObj.label) {
-      generateAIReview(chipObj, language);
+    if (chipObj.label === "All") {
+      if (selectedLabels.length === 1 && selectedLabels[0] === "All") {
+        generateAIReview(["All"], language);
+      } else {
+        setSelectedLabels(["All"]);
+      }
       return;
     }
-    setSelectedChipObj(chipObj);
+    let next = selectedLabels.filter((l) => l !== "All");
+    if (next.includes(chipObj.label)) {
+      next = next.filter((l) => l !== chipObj.label);
+    } else {
+      next = [...next, chipObj.label];
+      if (next.length > 3) next = next.slice(-3);
+    }
+    setSelectedLabels(next.length ? next : ["All"]);
   }
 
   function handleLanguageChange(lang) {
     if (lang === language) {
-      generateAIReview(selectedChipObj, lang);
+      generateAIReview(selectedLabels, lang);
       return;
     }
     setLanguage(lang);
@@ -264,7 +310,7 @@ END:VCARD`;
         {/* Filter Chips */}
         <div className="floating-pills-cloud">
           {CLIENT_CONFIG.chips.map((chip) => {
-            const active = selectedChipObj.label === chip.label;
+            const active = selectedLabels.includes(chip.label);
             return (
               <button
                 key={chip.label}
@@ -277,6 +323,8 @@ END:VCARD`;
             );
           })}
         </div>
+
+        <p className="chip-hint">Tap up to 3 keywords for your review</p>
 
         {/* Language Selector */}
         <div className="capsule-lang-dock">
@@ -305,7 +353,7 @@ END:VCARD`;
             <button
               type="button"
               disabled={loading || isTyping}
-              onClick={() => generateAIReview(selectedChipObj, language)}
+              onClick={() => generateAIReview(selectedLabels, language)}
               className="top-rewrite-btn"
             >
               <span>Rewrite</span>
@@ -550,6 +598,13 @@ END:VCARD`;
           color: #d19a3b;
           font-size: 16px;
           margin-bottom: 4px;
+        }
+        .chip-hint {
+          text-align: center;
+          font-size: 11px;
+          color: #9a8a76;
+          margin: -4px 0 10px;
+          letter-spacing: 0.3px;
         }
         .experience-tracker-title {
           font-size: 9px;
