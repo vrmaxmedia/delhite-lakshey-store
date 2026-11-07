@@ -978,7 +978,7 @@ END:VCARD`;
           width: 100%;
           height: 50px;
           border-radius: 999px;
-          background: linear-gradient(180deg, #95636a 0%, #805159 100%);
+          background: #751522;
           border: none;
           color: #ffffff;
           font-size: 12px;
