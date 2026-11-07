@@ -20,7 +20,18 @@ const HISTORY_SIZE = 60;       // server par yaad rakhe gaye pichhle reviews
 const OWNER_NAME = process.env.OWNER_NAME || 'Lakshay';
 const PRODUCT_WORD = 'phone';
 
-const IPHONES = ['iPhone 13', 'iPhone 14', 'iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 17'];
+// iPhone 12 se 18: naye models (15 se upar) zyada aate hain, purane (12, 13) kam
+// w = us series ka weight, variants = us series ke models (Pro, Pro Max waghera)
+const MODEL_SERIES = [
+  { n: '12', w: 1,  variants: [['iPhone 12', 3], ['iPhone 12 Pro', 2], ['iPhone 12 Pro Max', 1]] },
+  { n: '13', w: 2,  variants: [['iPhone 13', 3], ['iPhone 13 Pro', 2], ['iPhone 13 Pro Max', 2]] },
+  { n: '14', w: 4,  variants: [['iPhone 14', 3], ['iPhone 14 Plus', 1], ['iPhone 14 Pro', 2], ['iPhone 14 Pro Max', 2]] },
+  { n: '15', w: 8,  variants: [['iPhone 15', 3], ['iPhone 15 Plus', 1], ['iPhone 15 Pro', 3], ['iPhone 15 Pro Max', 3]] },
+  { n: '16', w: 10, variants: [['iPhone 16', 3], ['iPhone 16 Plus', 1], ['iPhone 16 Pro', 3], ['iPhone 16 Pro Max', 3]] },
+  { n: '17', w: 10, variants: [['iPhone 17', 3], ['iPhone 17 Pro', 3], ['iPhone 17 Pro Max', 3]] },
+  { n: '18', w: 5,  variants: [['iPhone 18', 3], ['iPhone 18 Pro', 3], ['iPhone 18 Pro Max', 3]] },
+];
+
 
 const SEO_KEYWORDS = [
   'iPhone in GTB Nagar',
@@ -79,8 +90,8 @@ const TOPICS = {
   },
   models: {
     id: 'models',
-    text: 'the iPhone models available (iPhone 13 to 17 series) and finding the exact model he wanted',
-    must: /iphone|13|14|15|16|17|model|pro/i,
+    text: 'the iPhone models available (iPhone 12 to 18 series) and finding the exact model he wanted',
+    must: /iphone|12|13|14|15|16|17|18|model|pro/i,
   },
   refurb: {
     id: 'refurb',
@@ -122,18 +133,16 @@ const TOPICS = {
 // Chips = keywords. Customer jo chip dabaye, review me wahi baat aani chahiye.
 // text = Gemini ko kya batana hai, must = review me kaun se shabd hone chahiye (check)
 const CHIPS = {
-  'Refurbished iPhone': { id: 'chip_refurb', text: 'the iPhone is a refurbished one that looks and works like new', must: /refurb|renew|second hand|second-hand|pre[- ]?owned|like new|naya jaisa|naye jaisa|used/i },
-  'Unused iPhone': { id: 'chip_unused', text: 'the iPhone is unused, a fresh piece', must: /unused|fresh|sealed|never used|naya|ekdum new|new piece|piece/i },
-  'iPhone 13 & 14': { id: 'chip_1314', text: 'he got an iPhone 13 or iPhone 14 within his budget', must: /13|14/, model: ['iPhone 13', 'iPhone 14', 'iPhone 14 Pro'] },
-  'iPhone 15 Series': { id: 'chip_15', text: 'he got an iPhone 15 series phone (15, 15 Pro or 15 Pro Max)', must: /15/, model: ['iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max'] },
-  'iPhone 16 & 17': { id: 'chip_1617', text: 'he got the latest iPhone 16 or iPhone 17', must: /16|17/, model: ['iPhone 16', 'iPhone 16 Pro', 'iPhone 17'] },
-  '100% Battery Health': { id: 'chip_battery', text: 'the battery health was shown as 100% and checked, good backup', must: /battery|backup|100/i },
+  'Refurbished': { id: 'chip_refurb', text: 'the iPhone is a refurbished one that looks and works like new', must: /refurb|renew|second hand|second-hand|pre[- ]?owned|like new|naya jaisa|naye jaisa|used/i },
+  'Unused': { id: 'chip_unused', text: 'the iPhone is unused, a fresh piece', must: /unused|fresh|sealed|never used|naya|ekdum new|new piece|piece/i },
+  'iPhone 12 to 18': { id: 'chip_models', text: 'he found the iPhone model he wanted', must: /iphone|model|pro/i }, // model/must buildPrompt me set hota hai
+  '100% Battery': { id: 'chip_battery', text: 'the battery health was shown as 100% and checked, good backup', must: /battery|backup|100/i },
   'Mint Condition': { id: 'chip_mint', text: 'the phone is in mint condition, clean body, no scratches', must: /mint|condition|scratch|clean|body|perfect/i },
   'Best Price': { id: 'chip_price', text: 'the price was fair and the best he found, no hidden charges', must: /price|rate|daam|paise|deal|budget|sasta|saste|pocket|kimat|value/i },
-  'Genuine Bill & Box': { id: 'chip_bill', text: 'he got a genuine bill and box, felt safe and trusted the shop', must: /bill|box|genuine|original|trust|bharosa|safe|vishwas/i },
-  'Camera & Screen Tested': { id: 'chip_tested', text: 'camera, screen and every function were tested in front of him before paying', must: /camera|screen|display|test|check|dikhaya|function/i },
+  'Bill & Box': { id: 'chip_bill', text: 'he got a genuine bill and box, felt safe and trusted the shop', must: /bill|box|genuine|original|trust|bharosa|safe|vishwas/i },
+  'Camera & Screen': { id: 'chip_tested', text: 'camera, screen and every function were tested in front of him before paying', must: /camera|screen|display|test|check|dikhaya|function/i },
   'Honest Advice': { id: 'chip_advice', text: 'the shopkeeper gave honest guidance, was polite and did not push the costly phone', must: /advice|suggest|guide|honest|salah|samjhaya|bataya|polite|patient|pressure|behav/i },
-  'GTB Nagar Store': { id: 'chip_location', text: 'the store is easy to find in GTB Nagar near the metro, Outram Lines', must: /gtb|outram|metro|location|jagah|rasta|nazdik|paas|easy to find|aasani/i },
+  'GTB Nagar': { id: 'chip_location', text: 'the store is easy to find in GTB Nagar near the metro, Outram Lines', must: /gtb|outram|metro|location|jagah|rasta|nazdik|paas|easy to find|aasani/i },
 };
 
 const ALL_TOPICS = ['location', 'politeness', 'pricing', 'quality', 'trust', 'battery', 'models', 'refurb', 'unused', 'camera', 'screen', 'speed', 'advice', 'testing'];
@@ -230,6 +239,19 @@ function pickWeighted(items) {
     if ((r -= i.w) <= 0) return i;
   }
   return items[0];
+}
+
+// Model chunna: pichhle 3 me aaya hua model dobara nahi, naye models zyada
+function pickModel(recentModels) {
+  const flat = [];
+  for (const sr of MODEL_SERIES) {
+    const total = sr.variants.reduce((a, v) => a + v[1], 0);
+    for (const [name, vw] of sr.variants) {
+      if (recentModels.includes(name)) continue;
+      flat.push({ name, series: sr.n, w: sr.w * (vw / total) });
+    }
+  }
+  return pickWeighted(flat);
 }
 
 // ~8 words = 1 line on phone
@@ -401,7 +423,18 @@ function buildPrompt(body, recent) {
   const description = String(body.description || '').slice(0, 600);
   const city = String(body.city || '').slice(0, 120);
 
-  const chips = chosenChips(body);
+  const recentModels = recent.map((r) => r.model).filter(Boolean).slice(-3);
+  let chips = chosenChips(body);
+  const hasModelChip = chips.some((c) => c.id === 'chip_models');
+  const picked = hasModelChip || chance(0.45) ? pickModel(recentModels) : null;
+  const model = picked ? picked.name : null;
+  if (hasModelChip) {
+    chips = chips.map((c) =>
+      c.id === 'chip_models'
+        ? { ...c, text: `he bought an ${picked.name}`, must: new RegExp(picked.series) }
+        : c
+    );
+  }
   const minLines = chips.length >= 3 ? 4 : chips.length === 2 ? 3 : 1;
   const length = chooseLength(recent, minLines);
   const persona = choosePersona(recent);
@@ -425,10 +458,6 @@ function buildPrompt(body, recent) {
   const seoPool = SEO_KEYWORDS.filter((k) => !recentSeo.includes(k));
   const seo = chance(0.3) ? pick(seoPool.length ? seoPool : SEO_KEYWORDS) : null;
 
-  const recentModels = recent.map((r) => r.model).filter(Boolean).slice(-3);
-  const modelPool = IPHONES.filter((m) => !recentModels.includes(m));
-  const chipModels = chips.filter((c) => c.model).flatMap((c) => c.model);
-  const model = chipModels.length ? pick(chipModels) : chance(0.45) ? pick(modelPool.length ? modelPool : IPHONES) : null;
 
   const languageBlock =
     language === 'HINGLISH'
@@ -455,7 +484,7 @@ ${longEnough ? `- Ending: ${ending}.` : ''}
 - Length: ${length.rule}. Stay inside this range.
 ${mentionName ? `- Mention the shop name "${businessName}" once, naturally.` : '- Do not repeat the full shop name.'}
 ${seo ? `- If it fits naturally, include the phrase "${seo}".` : ''}
-${model ? (chipModels.length ? `- Mention ${model} by name.` : `- You may mention ${model}.`) : ''}
+${model ? (hasModelChip ? `- Mention ${model} by name.` : `- You may mention ${model}.`) : ''}
 ${mentionStaff ? `- Mention the owner/staff "${OWNER_NAME}" once, naturally.` : '- Do not name any person.'}
 ${useEmoji ? '- One emoji at the very end is allowed.' : '- No emojis.'}
 
