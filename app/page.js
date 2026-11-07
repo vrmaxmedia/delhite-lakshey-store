@@ -47,7 +47,7 @@ const AGENCY_WA_LINK = `https://wa.me/${CLIENT_CONFIG.agencyWhatsapp}?text=${enc
   "Hi VR Max AI, I want to get a QR review system for my business."
 )}`;
 
-function useTypewriter(fullText, speed = 10) {
+function useTypewriter(fullText, speed = 12, step = 4) {
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
@@ -61,7 +61,7 @@ function useTypewriter(fullText, speed = 10) {
     setIsTyping(true);
     let index = 0;
     const timer = setInterval(() => {
-      index++;
+      index += step;
       setDisplayText(fullText.slice(0, index));
       if (index >= fullText.length) {
         clearInterval(timer);
@@ -69,7 +69,7 @@ function useTypewriter(fullText, speed = 10) {
       }
     }, speed);
     return () => clearInterval(timer);
-  }, [fullText, speed]);
+  }, [fullText, speed, step]);
 
   return { displayText, isTyping };
 }
@@ -112,7 +112,7 @@ export default function UniversalReviewPage() {
   const abortControllerRef = useRef(null);
   const requestIdRef = useRef(0);
   const recentLengthsRef = useRef([]);
-  const { displayText, isTyping } = useTypewriter(reviewDraft, 10);
+  const { displayText, isTyping } = useTypewriter(reviewDraft, 12, 4);
 
   useEffect(() => {
     setMounted(true);
