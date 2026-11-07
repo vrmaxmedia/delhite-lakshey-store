@@ -82,6 +82,16 @@ const TOPICS = {
     text: 'the iPhone models available (iPhone 13 to 17 series) and finding the exact model he wanted',
     must: /iphone|13|14|15|16|17|model|pro/i,
   },
+  refurb: {
+    id: 'refurb',
+    text: 'the phone is a refurbished iPhone that looks and works like new, he knew it was refurbished and was still very satisfied',
+    must: /refurb|renew|second hand|second-hand|used|pre[- ]?owned|like new|naya jaisa|naye jaisa/i,
+  },
+  unused: {
+    id: 'unused',
+    text: 'an unused, fresh-piece iPhone, never used before, felt like a new phone',
+    must: /unused|new|fresh|sealed|never used|naya|ekdum|piece/i,
+  },
   camera: {
     id: 'camera',
     text: 'the camera: photos and videos looked clear and sharp, he checked the camera before buying',
@@ -109,16 +119,24 @@ const TOPICS = {
   },
 };
 
-// Chip label -> kaun se topics us chip ke andar aa sakte hain (page.js ke chips ke label)
-const CHIP_TOPICS = {
-  'iPhone 13 to 17': ['models', 'camera', 'screen', 'speed'],
-  '100% Battery Health': ['battery'],
-  'Mint Condition': ['quality', 'screen', 'testing'],
-  'Best Market Price': ['pricing', 'advice'],
-  'GTB Nagar Store': ['location', 'politeness', 'trust'],
+// Chips = keywords. Customer jo chip dabaye, review me wahi baat aani chahiye.
+// text = Gemini ko kya batana hai, must = review me kaun se shabd hone chahiye (check)
+const CHIPS = {
+  'Refurbished iPhone': { id: 'chip_refurb', text: 'the iPhone is a refurbished one that looks and works like new', must: /refurb|renew|second hand|second-hand|pre[- ]?owned|like new|naya jaisa|naye jaisa|used/i },
+  'Unused iPhone': { id: 'chip_unused', text: 'the iPhone is unused, a fresh piece', must: /unused|fresh|sealed|never used|naya|ekdum new|new piece|piece/i },
+  'iPhone 13 & 14': { id: 'chip_1314', text: 'he got an iPhone 13 or iPhone 14 within his budget', must: /13|14/, model: ['iPhone 13', 'iPhone 14', 'iPhone 14 Pro'] },
+  'iPhone 15 Series': { id: 'chip_15', text: 'he got an iPhone 15 series phone (15, 15 Pro or 15 Pro Max)', must: /15/, model: ['iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max'] },
+  'iPhone 16 & 17': { id: 'chip_1617', text: 'he got the latest iPhone 16 or iPhone 17', must: /16|17/, model: ['iPhone 16', 'iPhone 16 Pro', 'iPhone 17'] },
+  '100% Battery Health': { id: 'chip_battery', text: 'the battery health was shown as 100% and checked, good backup', must: /battery|backup|100/i },
+  'Mint Condition': { id: 'chip_mint', text: 'the phone is in mint condition, clean body, no scratches', must: /mint|condition|scratch|clean|body|perfect/i },
+  'Best Price': { id: 'chip_price', text: 'the price was fair and the best he found, no hidden charges', must: /price|rate|daam|paise|deal|budget|sasta|saste|pocket|kimat|value/i },
+  'Genuine Bill & Box': { id: 'chip_bill', text: 'he got a genuine bill and box, felt safe and trusted the shop', must: /bill|box|genuine|original|trust|bharosa|safe|vishwas/i },
+  'Camera & Screen Tested': { id: 'chip_tested', text: 'camera, screen and every function were tested in front of him before paying', must: /camera|screen|display|test|check|dikhaya|function/i },
+  'Honest Advice': { id: 'chip_advice', text: 'the shopkeeper gave honest guidance, was polite and did not push the costly phone', must: /advice|suggest|guide|honest|salah|samjhaya|bataya|polite|patient|pressure|behav/i },
+  'GTB Nagar Store': { id: 'chip_location', text: 'the store is easy to find in GTB Nagar near the metro, Outram Lines', must: /gtb|outram|metro|location|jagah|rasta|nazdik|paas|easy to find|aasani/i },
 };
 
-const ALL_TOPICS = ['location', 'politeness', 'pricing', 'quality', 'trust', 'battery', 'models', 'camera', 'screen', 'speed', 'advice', 'testing'];
+const ALL_TOPICS = ['location', 'politeness', 'pricing', 'quality', 'trust', 'battery', 'models', 'refurb', 'unused', 'camera', 'screen', 'speed', 'advice', 'testing'];
 
 // Likhne wale 13 type ke customers (class, umar, andaaz)
 const PERSONAS = [
@@ -223,18 +241,20 @@ const LENGTHS = [
   { w: 14, lines: 5, min: 40, max: 52, rule: 'FIVE lines, 42 to 50 words' },
 ];
 
-function chooseLength(recent) {
+function chooseLength(recent, minLines = 1) {
   const lens = recent.map((r) => r.lines).filter(Boolean);
   const l1 = lens[lens.length - 1];
   const l2 = lens[lens.length - 2];
   const l3 = lens[lens.length - 3];
-  let pool = LENGTHS;
+  let pool = LENGTHS.filter((x) => x.lines >= minLines);
 
   const mid = (n) => n === 3 || n === 4;
   if (lens.length >= 3 && mid(l1) && mid(l2) && mid(l3)) {
-    pool = LENGTHS.filter((x) => !mid(x.lines));
+    const f = pool.filter((x) => !mid(x.lines));
+    if (f.length) pool = f;
   } else if (l1 && !mid(l1)) {
-    pool = LENGTHS.filter((x) => mid(x.lines));
+    const f = pool.filter((x) => mid(x.lines));
+    if (f.length) pool = f;
   }
   if (l1 && l1 === l2) {
     const f = pool.filter((x) => x.lines !== l1);
@@ -249,12 +269,16 @@ function choosePersona(recent) {
   return pick(pool.length ? pool : PERSONAS);
 }
 
-function chooseTopic(selectedService, recent) {
-  const label = String(selectedService || '').split(' (Context')[0].trim();
+function chooseTopic(recent) {
   const last = recent.map((r) => r.topic).filter(Boolean).slice(-2);
-  const ids = CHIP_TOPICS[label] || ALL_TOPICS;
-  const pool = ids.filter((t) => !last.includes(t));
-  return TOPICS[pick(pool.length ? pool : ids)];
+  const pool = ALL_TOPICS.filter((t) => !last.includes(t));
+  return TOPICS[pick(pool.length ? pool : ALL_TOPICS)];
+}
+
+// Customer ne jo chips chune (max 3) unhe nikalo
+function chosenChips(body) {
+  const labels = Array.isArray(body.selectedChips) ? body.selectedChips : [];
+  return labels.filter((l) => typeof l === 'string' && CHIPS[l]).slice(0, 3).map((l) => ({ label: l, ...CHIPS[l] }));
 }
 
 function chooseFrom(list, key, recent, n = 3) {
@@ -377,9 +401,14 @@ function buildPrompt(body, recent) {
   const description = String(body.description || '').slice(0, 600);
   const city = String(body.city || '').slice(0, 120);
 
-  const length = chooseLength(recent);
+  const chips = chosenChips(body);
+  const minLines = chips.length >= 3 ? 4 : chips.length === 2 ? 3 : 1;
+  const length = chooseLength(recent, minLines);
   const persona = choosePersona(recent);
-  const topic = chooseTopic(body.selectedService, recent);
+  const topic = chips.length
+    ? { id: chips[0].id, text: chips[0].text, must: chips[0].must }
+    : chooseTopic(recent);
+  const extraChips = chips.slice(1);
   const opener = chooseFrom(OPENERS, 'opener', recent, 3);
   const ending = chooseFrom(ENDINGS, 'ending', recent, 2);
   const style = pick(WRITING_STYLES);
@@ -387,7 +416,7 @@ function buildPrompt(body, recent) {
   const buyerLine = chance(0.5) ? pick(BUYER_LINES) + ' ' : '';
 
   const longEnough = length.lines >= 3;
-  const secondPoint = length.lines >= 4 && chance(0.5);
+  const secondPoint = !extraChips.length && length.lines >= 4 && chance(0.5);
   const mentionName = chance(0.4);
   const mentionStaff = topic.id === 'politeness' ? chance(0.5) : chance(0.15);
   const useEmoji = chance(0.08);
@@ -398,7 +427,8 @@ function buildPrompt(body, recent) {
 
   const recentModels = recent.map((r) => r.model).filter(Boolean).slice(-3);
   const modelPool = IPHONES.filter((m) => !recentModels.includes(m));
-  const model = chance(0.45) ? pick(modelPool.length ? modelPool : IPHONES) : null;
+  const chipModels = chips.filter((c) => c.model).flatMap((c) => c.model);
+  const model = chipModels.length ? pick(chipModels) : chance(0.45) ? pick(modelPool.length ? modelPool : IPHONES) : null;
 
   const languageBlock =
     language === 'HINGLISH'
@@ -418,14 +448,14 @@ ${examples}
 
 THIS REVIEW:
 - Main topic: ${topic.text}. The review must clearly be about this.
-${secondPoint ? '- You may add one small extra point at the end, from any other area.' : '- Stick to the main topic only.'}
+${extraChips.length ? `- ALSO naturally cover these points (all of them): ${extraChips.map((c) => c.text).join('; ')}.` : secondPoint ? '- You may add one small extra point at the end, from any other area.' : '- Stick to the main topic only.'}
 - Writing style: ${style}.
 - Opening: ${opener}.
 ${longEnough ? `- Ending: ${ending}.` : ''}
 - Length: ${length.rule}. Stay inside this range.
 ${mentionName ? `- Mention the shop name "${businessName}" once, naturally.` : '- Do not repeat the full shop name.'}
 ${seo ? `- If it fits naturally, include the phrase "${seo}".` : ''}
-${model ? `- You may mention ${model}.` : ''}
+${model ? (chipModels.length ? `- Mention ${model} by name.` : `- You may mention ${model}.`) : ''}
 ${mentionStaff ? `- Mention the owner/staff "${OWNER_NAME}" once, naturally.` : '- Do not name any person.'}
 ${useEmoji ? '- One emoji at the very end is allowed.' : '- No emojis.'}
 
@@ -439,7 +469,7 @@ HARD RULES:
 - End with a COMPLETE thought. Never stop mid-sentence.
 - Output only the review text.`.replace(/\n{3,}/g, '\n\n').replace(/\n\n(- )/g, '\n$1');
 
-  return { prompt, length, persona, topic, opener, ending, seo, model, language };
+  return { prompt, length, persona, topic, extraChips, opener, ending, seo, model, language };
 }
 
 async function callGemini(apiKey, payload, signal) {
@@ -459,7 +489,7 @@ async function callGemini(apiKey, payload, signal) {
 /* ------------------ ek koshish: likhwao + check karo ------------------ */
 async function attempt(apiKey, body, recent, signal) {
   const built = buildPrompt(body, recent);
-  const { prompt, length, persona, topic, opener, ending, seo, model, language } = built;
+  const { prompt, length, persona, topic, extraChips, opener, ending, seo, model, language } = built;
 
   const payload = {
     contents: [{ role: 'user', parts: [{ text: `Write the review for ${body.businessName} now.` }] }],
@@ -498,6 +528,7 @@ async function attempt(apiKey, body, recent, signal) {
     if (startsBanned(review)) return { ok: false, error: 'Banned opening used.' };
     if (!languageOk(review, language, words)) return { ok: false, error: 'Wrong language style.' };
     if (!topic.must.test(review)) return { ok: false, error: 'Review missed the selected topic.' };
+    if (extraChips.some((c) => !c.must.test(review))) return { ok: false, error: 'Review missed a selected keyword.' };
     const recentOpenings = recent.map((r) => r.open).filter(Boolean);
     if (tooSimilar(review, recentOpenings)) return { ok: false, error: 'Too similar to an earlier review.' };
 
