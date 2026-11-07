@@ -256,11 +256,10 @@ function pickModel(recentModels) {
 
 // ~8 words = 1 line on phone
 const LENGTHS = [
-  { w: 12, lines: 1, min: 7,  max: 11, rule: 'ONE short line, 7 to 10 words' },
-  { w: 16, lines: 2, min: 13, max: 21, rule: 'TWO lines, 14 to 20 words' },
-  { w: 30, lines: 3, min: 21, max: 31, rule: 'THREE lines, 22 to 30 words' },
-  { w: 28, lines: 4, min: 30, max: 42, rule: 'FOUR lines, 32 to 40 words' },
-  { w: 14, lines: 5, min: 40, max: 52, rule: 'FIVE lines, 42 to 50 words' },
+  { w: 14, lines: 1, min: 7,  max: 11, rule: 'ONE short line, 7 to 10 words' },
+  { w: 28, lines: 2, min: 11, max: 19, rule: 'TWO lines, 12 to 17 words' },
+  { w: 38, lines: 3, min: 18, max: 27, rule: 'THREE lines, 20 to 25 words' },
+  { w: 20, lines: 4, min: 25, max: 36, rule: 'FOUR lines, 27 to 33 words' },
 ];
 
 function chooseLength(recent, minLines = 1) {
@@ -435,7 +434,7 @@ function buildPrompt(body, recent) {
         : c
     );
   }
-  const minLines = chips.length >= 3 ? 4 : chips.length === 2 ? 3 : 1;
+  const minLines = chips.length >= 3 ? 3 : chips.length === 2 ? 2 : 1;
   const length = chooseLength(recent, minLines);
   const persona = choosePersona(recent);
   const topic = chips.length
