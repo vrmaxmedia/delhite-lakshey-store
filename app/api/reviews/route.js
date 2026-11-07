@@ -1,82 +1,51 @@
 import { NextResponse } from 'next/server';
 
-const MODEL = 'gemini-3.5-flash';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const chance = (p) => Math.random() < p;
+/* =====================================================================
+   SETTINGS (speed)
+   ===================================================================== */
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+const PARALLEL_CALLS = 2;      // ek saath 2 calls, jo pehle sahi aaye wahi use hoga
+const MAX_ROUNDS = 2;          // sab fail hone par sirf ek aur round
+const CALL_TIMEOUT_MS = 12000; // Gemini 12 sec me na de to cancel
+const MAX_OUTPUT_TOKENS = 300;
+const HISTORY_SIZE = 60;       // server par yaad rakhe gaye pichhle reviews
 
-function pickWeighted(items) {
-  const total = items.reduce((s, i) => s + i.w, 0);
-  let r = Math.random() * total;
-  for (const i of items) {
-    if ((r -= i.w) <= 0) return i;
-  }
-  return items[0];
-}
+/* =====================================================================
+   BUSINESS PACK  (naye business/category ke liye sirf yahi hissa badlega)
+   ===================================================================== */
+const OWNER_NAME = process.env.OWNER_NAME || 'Lakshay';
+const PRODUCT_WORD = 'phone';
 
-// ~8 words = 1 line on phone
-const LENGTHS = [
-  { w: 8,  lines: 1, min: 7,  max: 11, rule: 'ONE short line, 7 to 10 words' },
-  { w: 8,  lines: 2, min: 13, max: 21, rule: 'TWO lines, 14 to 20 words' },
-  { w: 34, lines: 3, min: 21, max: 31, rule: 'THREE lines, 22 to 30 words' },
-  { w: 34, lines: 4, min: 30, max: 42, rule: 'FOUR lines, 32 to 40 words' },
-  { w: 16, lines: 5, min: 40, max: 52, rule: 'FIVE lines, 42 to 50 words' },
+const IPHONES = ['iPhone 13', 'iPhone 14', 'iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 17'];
+
+const SEO_KEYWORDS = [
+  'iPhone in GTB Nagar',
+  'second hand iPhone in Delhi',
+  'refurbished iPhone',
+  'unused iPhone',
+  'iPhone with 100% battery health',
+  'best iPhone shop in Delhi',
+  'iPhone near GTB Nagar metro',
+  'Outram Lines GTB Nagar',
+  'genuine Apple iPhone',
+  'iPhone at best price in Delhi',
+  'iPhone 14 price in GTB Nagar',
+  'iPhone 15 Pro in Delhi',
+  'used iPhone Delhi',
+  'iPhone shop near GTB Nagar',
+  'Apple iPhone dealer in Delhi',
+  'iPhone 13 in GTB Nagar',
+  'trusted iPhone store in Delhi',
+  'iPhone 16 in Delhi',
+  'imported iPhone in Delhi',
+  'second hand iPhone near GTB Nagar',
 ];
 
-function chooseLength(recent) {
-  const lens = recent.map((r) => r.lines).filter(Boolean);
-  const l1 = lens[lens.length - 1];
-  const l2 = lens[lens.length - 2];
-  const l3 = lens[lens.length - 3];
-  let pool = LENGTHS;
-
-  const mid = (n) => n === 3 || n === 4;
-  if (lens.length >= 3 && mid(l1) && mid(l2) && mid(l3)) {
-    pool = LENGTHS.filter((x) => !mid(x.lines)); // 1, 2 ya 5
-  } else if (l1 && !mid(l1)) {
-    pool = LENGTHS.filter((x) => mid(x.lines)); // off-pattern ke baad wapas 3-4
-  }
-  if (l1 && l1 === l2) {
-    const f = pool.filter((x) => x.lines !== l1);
-    if (f.length) pool = f;
-  }
-  return pickWeighted(pool);
-}
-
-const VOICES = [
-  {
-    id: 'desi',
-    text: 'a simple desi Delhi person, speaks plain and rough, short sentences, no fancy words, a little loose grammar is fine',
-  },
-  {
-    id: 'family',
-    text: 'a middle class family person, practical and careful with money, talks about family or parents, honest and simple',
-  },
-  {
-    id: 'professional',
-    text: 'an educated working professional, polished and clear, well-structured sentences, calm and respectful tone',
-  },
-  {
-    id: 'young',
-    text: 'a college-age youngster, casual and slangy, quick typing style, energetic',
-  },
-  {
-    id: 'uncle',
-    text: 'an older respectful person (uncle ji), polite, simple words, blesses or thanks the shopkeeper',
-  },
-  {
-    id: 'blunt',
-    text: 'a straightforward no-nonsense person, few words, says only what mattered to him',
-  },
-];
-
-function chooseVoice(recent) {
-  const last = recent.map((r) => r.voice).filter(Boolean).slice(-2);
-  const pool = VOICES.filter((v) => !last.includes(v.id));
-  return pick(pool.length ? pool : VOICES);
-}
-
-// Topics: "All" me random, baaki tags me chip ka apna topic
+// Topics: id, prompt text, aur check regex (review me in me se koi shabd hona chahiye)
 const TOPICS = {
   location: {
     id: 'location',
@@ -113,25 +82,73 @@ const TOPICS = {
     text: 'the iPhone models available (iPhone 13 to 17 series) and finding the exact model he wanted',
     must: /iphone|13|14|15|16|17|model|pro/i,
   },
+  camera: {
+    id: 'camera',
+    text: 'the camera: photos and videos looked clear and sharp, he checked the camera before buying',
+    must: /camera|photo|video|pic|selfie|clear|sharp/i,
+  },
+  screen: {
+    id: 'screen',
+    text: 'the screen: clean bright display, smooth touch, no marks or scratches on it',
+    must: /screen|display|touch|scratch|bright|clean|mark/i,
+  },
+  speed: {
+    id: 'speed',
+    text: 'the performance: phone runs smooth and fast, no lag or hanging',
+    must: /smooth|fast|lag|hang|speed|perform|chal|tez|fatafat/i,
+  },
+  advice: {
+    id: 'advice',
+    text: 'honest guidance: the shopkeeper suggested the model that suits the need and budget, did not push the costly one',
+    must: /advice|suggest|guide|salah|budget|model|samjhaya|batay|sahi|bataya|zaroorat|need/i,
+  },
+  testing: {
+    id: 'testing',
+    text: 'testing: every function of the phone was checked in front of him before paying',
+    must: /test|check|dikhaya|front|saamne|samne|function|sab kuch|jaanch/i,
+  },
 };
 
-const CHIP_TOPIC = {
-  'iPhone 13 to 17': 'models',
-  '100% Battery Health': 'battery',
-  'Mint Condition': 'quality',
-  'Best Market Price': 'pricing',
-  'GTB Nagar Store': 'location',
+// Chip label -> kaun se topics us chip ke andar aa sakte hain (page.js ke chips ke label)
+const CHIP_TOPICS = {
+  'iPhone 13 to 17': ['models', 'camera', 'screen', 'speed'],
+  '100% Battery Health': ['battery'],
+  'Mint Condition': ['quality', 'screen', 'testing'],
+  'Best Market Price': ['pricing', 'advice'],
+  'GTB Nagar Store': ['location', 'politeness', 'trust'],
 };
 
-const ALL_TOPICS = ['location', 'politeness', 'pricing', 'quality', 'trust'];
+const ALL_TOPICS = ['location', 'politeness', 'pricing', 'quality', 'trust', 'battery', 'models', 'camera', 'screen', 'speed', 'advice', 'testing'];
 
-function chooseTopic(selectedService, recent) {
-  const label = String(selectedService || '').split(' (Context')[0].trim();
-  if (CHIP_TOPIC[label]) return TOPICS[CHIP_TOPIC[label]];
-  const last = recent.map((r) => r.topic).filter(Boolean).slice(-2);
-  const pool = ALL_TOPICS.filter((t) => !last.includes(t));
-  return TOPICS[pick(pool.length ? pool : ALL_TOPICS)];
-}
+// Likhne wale 13 type ke customers (class, umar, andaaz)
+const PERSONAS = [
+  { id: 'desi', text: 'a simple desi Delhi person, speaks plain and rough, short sentences, no fancy words, a little loose grammar is fine' },
+  { id: 'family', text: 'a middle class family person, practical and careful with money, talks about family or parents, honest and simple' },
+  { id: 'professional', text: 'an educated working professional, polished and clear, well-structured sentences, calm and respectful tone' },
+  { id: 'young', text: 'a college-age youngster, casual and slangy, quick typing style, energetic' },
+  { id: 'uncle', text: 'an older respectful person (uncle ji), polite, simple words, blesses or thanks the shopkeeper' },
+  { id: 'blunt', text: 'a straightforward no-nonsense person, few words, says only what mattered to him' },
+  { id: 'lowerclass', text: 'a daily-earning working person on a tight budget, very simple words, short plain sentences, cares about saving money and not being cheated' },
+  { id: 'business', text: 'a small business owner who needed a phone for work, practical, talks about value for money and not wasting time' },
+  { id: 'officer', text: 'a well-off senior person or officer, formal and precise, values genuine product and proper service' },
+  { id: 'mother', text: 'a housewife or mother choosing a phone for the family, careful, talks about what the family needed, warm tone' },
+  { id: 'firsttimer', text: 'someone buying their first iPhone, a little excited, was a bit worried about fake or old stock before coming' },
+  { id: 'giftbuyer', text: 'someone buying a phone as a gift for a family member, wanted something safe and genuine' },
+  { id: 'techie', text: 'a tech-aware person who compares options, notices small details, writes in a clear matter-of-fact way' },
+];
+
+const WRITING_STYLES = [
+  'neat spelling and proper grammar',
+  'casual WhatsApp-style typing, relaxed',
+  'all small letters, casual typing, no capital letters',
+  'simple and slightly rough, one tiny spelling slip is fine',
+];
+
+const HINGLISH_LEVELS = [
+  'mostly Hindi words, only a few English words like phone, price, battery',
+  'half Hindi, half English words',
+  'Hindi grammar but many common English words mixed in',
+];
 
 const OPENERS = [
   'start with the phone or what you bought',
@@ -140,24 +157,118 @@ const OPENERS = [
   'start with how you feel now',
   'start with why you came here',
   'start in the middle of a thought, casually',
+  'start with what you were worried about before coming',
+  'start with the exact phone model you took',
+  'start by saying how you found this shop (maps, friend or passing by)',
+  'start with your plain verdict in your own words',
+  'start with your budget or price',
+  'start with a simple statement about the whole experience',
 ];
 
-const IPHONES = ['iPhone 13', 'iPhone 14', 'iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 17'];
-
-const SEO_KEYWORDS = [
-  'iPhone in GTB Nagar',
-  'second hand iPhone in Delhi',
-  'refurbished iPhone',
-  'unused iPhone',
-  'iPhone with 100% battery health',
-  'best iPhone shop in Delhi',
-  'iPhone near GTB Nagar metro',
-  'Outram Lines GTB Nagar',
-  'genuine Apple iPhone',
-  'iPhone at best price in Delhi',
+const ENDINGS = [
+  'end with a small thanks or blessing',
+  'end by saying you would tell friends and family',
+  'end by saying you will come here again',
+  'end with a short plain remark about the deal',
+  'end with one line about how you feel about the phone',
+  'just stop naturally after your last point, no wrap-up line',
 ];
 
-const BANNED_OPENINGS = ['Great', 'Best', 'Amazing', 'Excellent', 'Highly recommend', 'Bhai', 'Superb', 'Awesome', 'The staff here'];
+const BUYER_LINES = [
+  'You bought it for yourself.',
+  'You bought it for your parents.',
+  'You bought it for your child.',
+  'You bought it as a gift.',
+  'You bought it for work.',
+];
+
+// Sirf tone samjhane ke liye (copy nahi karna). Koi full stop nahi.
+const EXAMPLES = {
+  ENGLISH: [
+    'Went in with a fixed budget and the owner showed me two options without pushing anything, took the one I liked and it was done in minutes',
+    'Phone looks brand new, they checked everything in front of me before I paid, happy with the deal',
+    'Easy to find near the metro, quick and honest dealing, no time wasted',
+    'My son wanted an iPhone for months, finally got one here at a price that did not hurt, he is very happy',
+  ],
+  HINGLISH: [
+    'budget ke hisaab se phone dikhaya, koi pressure nahi diya, sab kuch check karke diya, abhi tak koi dikkat nahi aayi',
+    'dusri dukaano se rate pucha tha yahan sabse sahi laga, bill aur box dono mile, bharosa ho gaya',
+    'phone ekdum naya jaisa hai, battery bhi sahi dikha rahi hai, ghar walon ko bhi pasand aaya',
+    'metro ke paas hai dhoondhne me dikkat nahi hui, seedhi baat karte hain, time kharab nahi hua',
+  ],
+};
+
+/* =====================================================================
+   ENGINE  (sab categories me same rahega)
+   ===================================================================== */
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const chance = (p) => Math.random() < p;
+const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+function pickWeighted(items) {
+  const total = items.reduce((s, i) => s + i.w, 0);
+  let r = Math.random() * total;
+  for (const i of items) {
+    if ((r -= i.w) <= 0) return i;
+  }
+  return items[0];
+}
+
+// ~8 words = 1 line on phone
+const LENGTHS = [
+  { w: 12, lines: 1, min: 7,  max: 11, rule: 'ONE short line, 7 to 10 words' },
+  { w: 16, lines: 2, min: 13, max: 21, rule: 'TWO lines, 14 to 20 words' },
+  { w: 30, lines: 3, min: 21, max: 31, rule: 'THREE lines, 22 to 30 words' },
+  { w: 28, lines: 4, min: 30, max: 42, rule: 'FOUR lines, 32 to 40 words' },
+  { w: 14, lines: 5, min: 40, max: 52, rule: 'FIVE lines, 42 to 50 words' },
+];
+
+function chooseLength(recent) {
+  const lens = recent.map((r) => r.lines).filter(Boolean);
+  const l1 = lens[lens.length - 1];
+  const l2 = lens[lens.length - 2];
+  const l3 = lens[lens.length - 3];
+  let pool = LENGTHS;
+
+  const mid = (n) => n === 3 || n === 4;
+  if (lens.length >= 3 && mid(l1) && mid(l2) && mid(l3)) {
+    pool = LENGTHS.filter((x) => !mid(x.lines));
+  } else if (l1 && !mid(l1)) {
+    pool = LENGTHS.filter((x) => mid(x.lines));
+  }
+  if (l1 && l1 === l2) {
+    const f = pool.filter((x) => x.lines !== l1);
+    if (f.length) pool = f;
+  }
+  return pickWeighted(pool);
+}
+
+function choosePersona(recent) {
+  const last = recent.map((r) => r.voice).filter(Boolean).slice(-4);
+  const pool = PERSONAS.filter((v) => !last.includes(v.id));
+  return pick(pool.length ? pool : PERSONAS);
+}
+
+function chooseTopic(selectedService, recent) {
+  const label = String(selectedService || '').split(' (Context')[0].trim();
+  const last = recent.map((r) => r.topic).filter(Boolean).slice(-2);
+  const ids = CHIP_TOPICS[label] || ALL_TOPICS;
+  const pool = ids.filter((t) => !last.includes(t));
+  return TOPICS[pick(pool.length ? pool : ids)];
+}
+
+function chooseFrom(list, key, recent, n = 3) {
+  const last = recent.map((r) => r[key]).filter((v) => v !== undefined && v !== null).slice(-n);
+  const pool = list.filter((x) => !last.includes(x));
+  return pick(pool.length ? pool : list);
+}
+
+const BANNED_OPENINGS = [
+  'Great', 'Best', 'Amazing', 'Excellent', 'Highly recommend', 'Bhai', 'Superb', 'Awesome', 'The staff here',
+  'Outstanding', 'Fantastic', 'Wonderful', 'Perfect', 'Must visit', 'Trust me',
+];
+
+const AI_PHRASES = /seamless|hassle[- ]free|top[- ]notch|look no further|go-to|game[- ]changer|one[- ]stop|unparalleled|exceptional|impeccable|commendable|must[- ]visit|highly recommended|hands down|truly|delighted|kudos|—|–/i;
 
 const DANGLING = new Set([
   'to', 'aur', 'ki', 'ke', 'ka', 'se', 'me', 'mein', 'par', 'pe', 'ko', 'toh',
@@ -165,28 +276,55 @@ const DANGLING = new Set([
   'so', 'if', 'or', 'because', 'jo', 'jab', 'agar', 'lekin', 'ya', 'jaise', 'kyunki',
 ]);
 
+// NOTE: 'the' yahan se hata diya (English me bahut aata hai, galat reject karta tha)
 const HINDI_WORDS = new Set([
   'hai', 'hain', 'nahi', 'nahin', 'bahut', 'bohot', 'bhot', 'mera', 'meri', 'mere', 'mujhe', 'hume',
-  'aur', 'ki', 'ke', 'ka', 'ko', 'se', 'par', 'pe', 'tha', 'thi', 'the', 'kiya', 'mila', 'mil', 'gaya', 'gayi',
+  'aur', 'ki', 'ke', 'ka', 'ko', 'se', 'par', 'pe', 'tha', 'thi', 'kiya', 'mila', 'mil', 'gaya', 'gayi',
   'liya', 'wala', 'wale', 'jo', 'kaafi', 'accha', 'acha', 'achha', 'sach', 'yahan', 'yaha', 'kar', 'karke', 'raha',
   'rahe', 'rahi', 'laga', 'lagi', 'bilkul', 'ekdum', 'sab', 'kuch', 'koi', 'phir', 'fir', 'bhi', 'toh', 'lekin',
   'isliye', 'abhi', 'dekh', 'dekha', 'diya', 'dikhaya', 'samjhaya', 'sahi', 'dukaan', 'dukan', 'aap', 'aapne',
-  'paise', 'kam', 'jyada', 'zyada', 'badhiya', 'mast', 'yaar',
+  'paise', 'kam', 'jyada', 'zyada', 'badhiya', 'mast', 'yaar', 'mein', 'yeh', 'ye', 'woh', 'wo', 'ne', 'hu', 'hun', 'tak', 'wahan', 'sabse',
 ]);
 
-async function callGemini(apiKey, payload) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }
-  );
-  const data = await res.json();
-  return { res, data };
+/* ------------------ yaadasht (server par, best-effort) ------------------ */
+const HISTORY = []; // { open, ws }
+const HITS = new Map(); // ip -> [timestamps]
+
+const openingOf = (text) => text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean).slice(0, 3).join(' ');
+const wordSet = (t) => new Set(t.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((w) => w.length > 2));
+
+function tooSimilar(text, recentOpenings) {
+  const open = openingOf(text);
+  if (recentOpenings.includes(open)) return true;
+  const ws = wordSet(text);
+  for (const h of HISTORY) {
+    if (h.open === open) return true;
+    let inter = 0;
+    for (const w of ws) if (h.ws.has(w)) inter++;
+    const union = ws.size + h.ws.size - inter || 1;
+    if (inter / union > 0.45) return true;
+  }
+  return false;
 }
 
+function remember(text) {
+  HISTORY.push({ open: openingOf(text), ws: wordSet(text) });
+  while (HISTORY.length > HISTORY_SIZE) HISTORY.shift();
+}
+
+function rateLimited(request) {
+  const ip = (request.headers.get('x-forwarded-for') || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const arr = (HITS.get(ip) || []).filter((t) => now - t < 5 * 60 * 1000);
+  arr.push(now);
+  HITS.set(ip, arr);
+  if (HITS.size > 2000) {
+    for (const [k, v] of HITS) if (!v.some((t) => now - t < 5 * 60 * 1000)) HITS.delete(k);
+  }
+  return arr.length > 25; // 5 minute me 25 se zyada nahi
+}
+
+/* ------------------ safai aur checks ------------------ */
 function cleanReview(text) {
   return text
     .replace(/^["'`\s]+|["'`\s]+$/g, '')
@@ -197,6 +335,18 @@ function cleanReview(text) {
     .replace(/\.+$/g, '')
     .replace(/,\s*,/g, ',')
     .trim();
+}
+
+// Adhoora ending ho to dobara Gemini ko bulane ke bajaye code se kaat do
+function fixCutOff(text) {
+  let parts = text.trim().replace(/[,\-\s]+$/g, '').split(/\s+/);
+  while (parts.length > 6) {
+    const last = parts[parts.length - 1].toLowerCase().replace(/[^a-z]/g, '');
+    if (!DANGLING.has(last)) break;
+    parts.pop();
+    parts = parts.join(' ').replace(/[,\-\s]+$/g, '').split(/\s+/);
+  }
+  return parts.join(' ');
 }
 
 function looksCutOff(text) {
@@ -214,57 +364,175 @@ function languageOk(text, language, words) {
   return h <= 2;
 }
 
+function startsBanned(text) {
+  const t = text.trim().toLowerCase();
+  return BANNED_OPENINGS.some((b) => t.startsWith(b.toLowerCase()));
+}
+
+/* ------------------ Gemini ko jaane wali command ------------------ */
 function buildPrompt(body, recent) {
-  const { businessName, category, description, city, selectedService, language } = body;
+  const language = body.language === 'HINGLISH' ? 'HINGLISH' : 'ENGLISH';
+  const businessName = String(body.businessName || '').slice(0, 120);
+  const category = String(body.category || '').slice(0, 200);
+  const description = String(body.description || '').slice(0, 600);
+  const city = String(body.city || '').slice(0, 120);
 
   const length = chooseLength(recent);
-  const voice = chooseVoice(recent);
-  const topic = chooseTopic(selectedService, recent);
-  const opener = pick(OPENERS);
+  const persona = choosePersona(recent);
+  const topic = chooseTopic(body.selectedService, recent);
+  const opener = chooseFrom(OPENERS, 'opener', recent, 3);
+  const ending = chooseFrom(ENDINGS, 'ending', recent, 2);
+  const style = pick(WRITING_STYLES);
+  const hinglishLevel = pick(HINGLISH_LEVELS);
+  const buyerLine = chance(0.5) ? pick(BUYER_LINES) + ' ' : '';
 
-  const mentionName = chance(0.5);
+  const longEnough = length.lines >= 3;
+  const secondPoint = length.lines >= 4 && chance(0.5);
+  const mentionName = chance(0.4);
   const mentionStaff = topic.id === 'politeness' ? chance(0.5) : chance(0.15);
   const useEmoji = chance(0.08);
-  const model = chance(0.55) ? pick(IPHONES) : null;
-  const seo = chance(0.8) ? pick(SEO_KEYWORDS) : null;
-  const secondPoint = length.lines >= 4 && chance(0.5);
+
+  const recentSeo = recent.map((r) => r.seo).filter(Boolean).slice(-8);
+  const seoPool = SEO_KEYWORDS.filter((k) => !recentSeo.includes(k));
+  const seo = chance(0.3) ? pick(seoPool.length ? seoPool : SEO_KEYWORDS) : null;
+
+  const recentModels = recent.map((r) => r.model).filter(Boolean).slice(-3);
+  const modelPool = IPHONES.filter((m) => !recentModels.includes(m));
+  const model = chance(0.45) ? pick(modelPool.length ? modelPool : IPHONES) : null;
 
   const languageBlock =
     language === 'HINGLISH'
-      ? `LANGUAGE (MOST IMPORTANT): Write in HINGLISH = Hindi sentences typed in English/Roman letters, like a Delhi person on WhatsApp. Grammar must be Hindi (hai, tha, kiya, mila, nahi, bahut, aur, ke liye, wala etc.) with common English words like phone, battery, price, staff mixed in. Product names and keywords can stay in English. Never write a full English sentence. Never use Devanagari.`
+      ? `LANGUAGE (MOST IMPORTANT): Write in HINGLISH = Hindi sentences typed in English/Roman letters, like a Delhi person on WhatsApp. Level: ${hinglishLevel}. Grammar must be Hindi (hai, tha, kiya, mila, nahi, bahut, aur, ke liye, wala etc.). Product names and keywords can stay in English. Never write a full English sentence. Never use Devanagari.`
       : `LANGUAGE (MOST IMPORTANT): Write in simple natural English like an Indian customer. Do not use Hindi words.`;
+
+  const examples = shuffle(EXAMPLES[language]).slice(0, 3).map((e) => `- ${e}`).join('\n');
 
   const prompt = `${languageBlock}
 
-You are ${voice.text}. You bought a phone from this shop and are writing a Google Maps review.
+You are ${persona.text}. ${buyerLine}You bought a ${PRODUCT_WORD} from this shop and are writing a Google Maps review.
+Business: ${businessName} (${city}) | ${category}
+About: ${description}
 
-Business: ${businessName} (${city})
-Category: ${category}
-About: ${description || ''}
+Tone samples from other customers (only for feel, never copy words or structure):
+${examples}
 
-REVIEW RULES:
-- Main topic of the review: ${topic.text}. The review must clearly be about this.
+THIS REVIEW:
+- Main topic: ${topic.text}. The review must clearly be about this.
 ${secondPoint ? '- You may add one small extra point at the end, from any other area.' : '- Stick to the main topic only.'}
-- Voice: write exactly like the person described above, so this review sounds different from other customers.
-- Opening: ${opener}
+- Writing style: ${style}.
+- Opening: ${opener}.
+${longEnough ? `- Ending: ${ending}.` : ''}
 - Length: ${length.rule}. Stay inside this range.
 ${mentionName ? `- Mention the shop name "${businessName}" once, naturally.` : '- Do not repeat the full shop name.'}
 ${seo ? `- If it fits naturally, include the phrase "${seo}".` : ''}
 ${model ? `- You may mention ${model}.` : ''}
-${mentionStaff ? '- Mention the owner/staff "Lakshay" once, naturally.' : '- Do not name any person.'}
+${mentionStaff ? `- Mention the owner/staff "${OWNER_NAME}" once, naturally.` : '- Do not name any person.'}
 ${useEmoji ? '- One emoji at the very end is allowed.' : '- No emojis.'}
 
 HARD RULES:
 - ONE single paragraph. No line breaks, bullets or title.
 - Do NOT use a full stop (.) anywhere. Use commas, "aur"/"and", or just flow.
 - Never start with: ${BANNED_OPENINGS.join(', ')}.
-- Sound like a real customer, not an advertisement. No hashtags, slogans or keyword stuffing.
-- Do not invent facts: no other market names, no exact prices, no discounts, no warranty promises.
+- Sound like a real customer, not an advertisement. No hashtags, slogans, keyword stuffing, no dashes. Avoid polished marketing words (seamless, hassle-free, top-notch, exceptional).
+- Do not invent facts: only talk about what the main topic says. No other market names, no exact prices, no discounts, no warranty promises.
 - Do not use the word "wholesale".
 - End with a COMPLETE thought. Never stop mid-sentence.
-- Output only the review text.`;
+- Output only the review text.`.replace(/\n{3,}/g, '\n\n').replace(/\n\n(- )/g, '\n$1');
 
-  return { prompt, length, voice, topic };
+  return { prompt, length, persona, topic, opener, ending, seo, model, language };
+}
+
+async function callGemini(apiKey, payload, signal) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal,
+    }
+  );
+  const data = await res.json();
+  return { res, data };
+}
+
+/* ------------------ ek koshish: likhwao + check karo ------------------ */
+async function attempt(apiKey, body, recent, signal) {
+  const built = buildPrompt(body, recent);
+  const { prompt, length, persona, topic, opener, ending, seo, model, language } = built;
+
+  const payload = {
+    contents: [{ role: 'user', parts: [{ text: `Write the review for ${body.businessName} now.` }] }],
+    systemInstruction: { parts: [{ text: prompt }] },
+    generationConfig: {
+      temperature: 1.0,
+      topP: 0.95,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+      thinkingConfig: { thinkingBudget: 0 },
+    },
+  };
+
+  try {
+    let { res, data } = await callGemini(apiKey, payload, signal);
+
+    if (!res.ok && /thinking/i.test(data?.error?.message || '')) {
+      delete payload.generationConfig.thinkingConfig;
+      ({ res, data } = await callGemini(apiKey, payload, signal));
+    }
+    if (!res.ok) return { ok: false, error: data?.error?.message || 'Gemini API request failed.' };
+
+    const candidate = data.candidates?.[0];
+    const parts = candidate?.content?.parts || [];
+    const raw = parts.filter((p) => !p.thought).map((p) => p.text || '').join('');
+    const review = fixCutOff(cleanReview(raw));
+    const words = review.split(/\s+/).filter(Boolean).length;
+
+    if (!review) return { ok: false, error: 'Empty response from Gemini.' };
+    if (candidate?.finishReason === 'MAX_TOKENS') return { ok: false, error: 'Response was cut off.' };
+    if (looksCutOff(review)) return { ok: false, error: 'Review ended mid-sentence.' };
+    if (words > length.max + 8) return { ok: false, error: 'Review too long.' };
+    if (words < Math.floor(length.min * 0.75)) return { ok: false, error: 'Review too short.' };
+    if (/[ऀ-ॿ]/.test(review)) return { ok: false, error: 'Devanagari used.' };
+    if (/wholesale/i.test(review)) return { ok: false, error: 'Banned word used.' };
+    if (AI_PHRASES.test(review)) return { ok: false, error: 'Robotic phrase used.' };
+    if (startsBanned(review)) return { ok: false, error: 'Banned opening used.' };
+    if (!languageOk(review, language, words)) return { ok: false, error: 'Wrong language style.' };
+    if (!topic.must.test(review)) return { ok: false, error: 'Review missed the selected topic.' };
+    const recentOpenings = recent.map((r) => r.open).filter(Boolean);
+    if (tooSimilar(review, recentOpenings)) return { ok: false, error: 'Too similar to an earlier review.' };
+
+    return {
+      ok: true,
+      review,
+      meta: {
+        lines: length.lines,
+        voice: persona.id,
+        topic: topic.id,
+        opener,
+        ending,
+        seo: seo || null,
+        model: model || null,
+        open: openingOf(review),
+      },
+    };
+  } catch (e) {
+    return { ok: false, error: e?.name === 'AbortError' ? 'aborted' : e?.message || 'Request failed.', aborted: e?.name === 'AbortError' };
+  }
+}
+
+// Jo pehle sahi result de, wahi lo
+function firstValid(tasks) {
+  return new Promise((resolve) => {
+    let pending = tasks.length;
+    let firstError = null;
+    for (const t of tasks) {
+      t.then((r) => {
+        if (r.ok) return resolve(r);
+        if (!r.aborted && !firstError) firstError = r.error;
+        if (--pending === 0) resolve({ ok: false, error: firstError || 'Failed to generate review draft.' });
+      });
+    }
+  });
 }
 
 export async function POST(request) {
@@ -274,6 +542,9 @@ export async function POST(request) {
     if (!apiKey) {
       return NextResponse.json({ error: 'API Key not configured.' }, { status: 500 });
     }
+    if (rateLimited(request)) {
+      return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 });
+    }
 
     const recent = (Array.isArray(body.recentLengths) ? body.recentLengths : [])
       .filter((r) => r && typeof r === 'object')
@@ -281,50 +552,22 @@ export async function POST(request) {
 
     let lastError = 'Failed to generate review draft.';
 
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const { prompt, length, voice, topic } = buildPrompt(body, recent);
+    for (let round = 0; round < MAX_ROUNDS; round++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), CALL_TIMEOUT_MS);
 
-      const payload = {
-        contents: [{ role: 'user', parts: [{ text: `Write the review for ${body.businessName} now.` }] }],
-        systemInstruction: { parts: [{ text: prompt }] },
-        generationConfig: {
-          temperature: 1.0,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-          thinkingConfig: { thinkingBudget: 0 },
-        },
-      };
+      const winner = await firstValid(
+        Array.from({ length: PARALLEL_CALLS }, () => attempt(apiKey, body, recent, controller.signal))
+      );
 
-      let { res, data } = await callGemini(apiKey, payload);
+      clearTimeout(timer);
+      controller.abort(); // bacha hua dusra call band
 
-      if (!res.ok && /thinking/i.test(data.error?.message || '')) {
-        delete payload.generationConfig.thinkingConfig;
-        ({ res, data } = await callGemini(apiKey, payload));
+      if (winner.ok) {
+        remember(winner.review);
+        return NextResponse.json({ review: winner.review, meta: winner.meta });
       }
-
-      if (!res.ok) {
-        lastError = data.error?.message || 'Gemini API request failed.';
-        continue;
-      }
-
-      const candidate = data.candidates?.[0];
-      const parts = candidate?.content?.parts || [];
-      const raw = parts.filter((p) => !p.thought).map((p) => p.text || '').join('');
-      const review = cleanReview(raw);
-      const words = review.split(/\s+/).filter(Boolean).length;
-
-      if (!review) { lastError = 'Empty response from Gemini.'; continue; }
-      if (candidate?.finishReason === 'MAX_TOKENS') { lastError = 'Response was cut off.'; continue; }
-      if (looksCutOff(review)) { lastError = 'Review ended mid-sentence.'; continue; }
-      if (words > length.max + 8) { lastError = 'Review too long.'; continue; }
-      if (words < Math.floor(length.min * 0.75)) { lastError = 'Review too short.'; continue; }
-      if (!languageOk(review, body.language, words)) { lastError = 'Wrong language style.'; continue; }
-      if (!topic.must.test(review)) { lastError = 'Review missed the selected topic.'; continue; }
-
-      return NextResponse.json({
-        review,
-        meta: { lines: length.lines, voice: voice.id, topic: topic.id },
-      });
+      lastError = winner.error;
     }
 
     throw new Error(lastError);
