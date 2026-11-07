@@ -6,9 +6,9 @@ const CLIENT_CONFIG = {
   clientId: "delhite_lakshay_01",
   businessName: "Delhite Lakshay Store",
   subHeading: "Trusted Refurbished & Unused Apple iPhone Specialist",
-  tagline: "REFURBISHED & UNUSED IPHONE 13 TO 17 • BEST DEALS IN DELHI",
+  tagline: "REFURBISHED & UNUSED IPHONE 12 TO 18 • BEST DEALS IN DELHI",
   description:
-    "Trusted refurbished and unused iPhone specialist in GTB Nagar, Delhi offering premium imported and second-hand Apple iPhones (iPhone 13, 14, 15, 16, 17 series including Pro & Pro Max) at fair market pricing with verified 100% battery health.",
+    "Trusted refurbished and unused iPhone specialist in GTB Nagar, Delhi offering premium imported and second-hand Apple iPhones (iPhone 12 to iPhone 18 series including Pro & Pro Max) at fair market pricing with verified 100% battery health.",
   city: "GTB Nagar, Delhi 110009",
   fullAddress: "1594, Outram Ln, Outram Lines, GTB Nagar, Delhi, 110009",
   phone: "+919999652654",
@@ -31,18 +31,16 @@ const CLIENT_CONFIG = {
 
   chips: [
     { label: "All", context: "overall store experience" },
-    { label: "Refurbished iPhone", context: "refurbished iPhone that looks and works like new" },
-    { label: "Unused iPhone", context: "unused fresh piece iPhone" },
-    { label: "iPhone 13 & 14", context: "iPhone 13 or iPhone 14 in budget" },
-    { label: "iPhone 15 Series", context: "iPhone 15, 15 Pro or 15 Pro Max" },
-    { label: "iPhone 16 & 17", context: "latest iPhone 16 or iPhone 17" },
-    { label: "100% Battery Health", context: "100% battery health shown and checked" },
+    { label: "Refurbished", context: "refurbished iPhone that looks and works like new" },
+    { label: "Unused", context: "unused fresh piece iPhone" },
+    { label: "iPhone 12 to 18", context: "any iPhone model from 12 to 18, latest models more" },
+    { label: "100% Battery", context: "100% battery health shown and checked" },
     { label: "Mint Condition", context: "clean body, no scratches, mint condition" },
     { label: "Best Price", context: "fair best price without hidden charges" },
-    { label: "Genuine Bill & Box", context: "genuine bill and box, trust" },
-    { label: "Camera & Screen Tested", context: "camera, screen and every function tested before buying" },
+    { label: "Bill & Box", context: "genuine bill and box, trust" },
+    { label: "Camera & Screen", context: "camera, screen and every function tested before buying" },
     { label: "Honest Advice", context: "honest guidance and polite staff, no pressure" },
-    { label: "GTB Nagar Store", context: "easy to find store near GTB Nagar metro, Outram Lines" },
+    { label: "GTB Nagar", context: "easy to find store near GTB Nagar metro, Outram Lines" },
   ],
 };
 
@@ -513,7 +511,7 @@ END:VCARD`;
         .soft-luxury-viewport {
           min-height: 100vh;
           background: #fbf9f4;
-          padding: 14px 16px 24px;
+          padding: 10px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           color: #2b2016;
@@ -530,22 +528,22 @@ END:VCARD`;
           text-align: center;
         }
         .brand-medallion-badge {
-          margin-top: 12px;
-          margin-bottom: 6px;
+          margin-top: 2px;
+          margin-bottom: 2px;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
         .logo-circle-container {
-          width: 135px;
-          height: 135px;
+          width: 98px;
+          height: 98px;
           border-radius: 50%;
           background-color: transparent;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
           box-shadow: 0 14px 34px rgba(110, 21, 29, 0.25), 0 6px 14px rgba(0,0,0,0.12);
-          margin-bottom: 12px;
+          margin-bottom: 8px;
           animation: floatLogo 3.5s ease-in-out infinite;
           border: 3px solid #d1b183;
           transition: transform 0.2s ease;
@@ -562,7 +560,7 @@ END:VCARD`;
         }
         .brand-main-title {
           font-family: Georgia, serif;
-          font-size: 26px;
+          font-size: 23px;
           font-weight: 800;
           color: #591016;
           margin: 0 0 4px;
@@ -571,16 +569,16 @@ END:VCARD`;
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
-          font-size: 13.5px;
+          font-size: 12.5px;
           color: #b78a48;
-          margin: 0 0 10px;
+          margin: 0 0 4px;
         }
         .royal-shahi-divider {
           display: flex;
           align-items: center;
           justify-content: center;
           width: 85%;
-          margin: 8px auto 12px;
+          margin: 4px auto 8px;
           gap: 10px;
         }
         .divider-line {
@@ -596,14 +594,14 @@ END:VCARD`;
           display: flex;
           gap: 4px;
           color: #d19a3b;
-          font-size: 16px;
-          margin-bottom: 4px;
+          font-size: 14px;
+          margin-bottom: 2px;
         }
         .chip-hint {
           text-align: center;
           font-size: 11px;
           color: #9a8a76;
-          margin: -4px 0 10px;
+          margin: 0 0 8px;
           letter-spacing: 0.3px;
         }
         .experience-tracker-title {
@@ -612,20 +610,20 @@ END:VCARD`;
           letter-spacing: 2px;
           color: #635345;
           text-transform: uppercase;
-          margin: 0 0 12px;
+          margin: 0 0 8px;
         }
         .floating-pills-cloud {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          gap: 6px;
-          margin-bottom: 14px;
+          gap: 5px;
+          margin: 0 auto 8px;
           width: 100%;
         }
         .embossed-pill {
           border-radius: 999px;
-          padding: 6px 14px;
-          font-size: 11px;
+          padding: 5px 11px;
+          font-size: 11.5px;
           background: #ffffff;
           color: #591016;
           border: 1px solid #ebd9c3;
@@ -648,7 +646,7 @@ END:VCARD`;
           border-radius: 999px;
           padding: 3px;
           gap: 2px;
-          margin-bottom: 16px;
+          margin: 0 auto 12px;
           box-shadow: 0 3px 10px rgba(180, 155, 130, 0.12);
           border: 1px solid #ebd9c3;
         }
@@ -718,7 +716,7 @@ END:VCARD`;
           transform: scale(0.95);
         }
         .review-display-zone {
-          min-height: 80px;
+          min-height: 132px;
           display: flex;
           align-items: center;
           justify-content: center;
