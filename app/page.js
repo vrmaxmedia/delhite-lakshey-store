@@ -535,8 +535,8 @@ END:VCARD`;
           align-items: center;
         }
         .logo-circle-container {
-          width: 98px;
-          height: 98px;
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
           background-color: transparent;
           background-size: cover;
@@ -560,7 +560,7 @@ END:VCARD`;
         }
         .brand-main-title {
           font-family: Georgia, serif;
-          font-size: 23px;
+          font-size: 21px;
           font-weight: 800;
           color: #591016;
           margin: 0 0 4px;
@@ -569,16 +569,16 @@ END:VCARD`;
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
-          font-size: 12.5px;
+          font-size: 12px;
           color: #b78a48;
-          margin: 0 0 4px;
+          margin: 0 0 2px;
         }
         .royal-shahi-divider {
           display: flex;
           align-items: center;
           justify-content: center;
           width: 85%;
-          margin: 4px auto 8px;
+          margin: 2px auto 6px;
           gap: 10px;
         }
         .divider-line {
@@ -594,14 +594,14 @@ END:VCARD`;
           display: flex;
           gap: 4px;
           color: #d19a3b;
-          font-size: 14px;
-          margin-bottom: 2px;
+          font-size: 12px;
+          margin-bottom: 0;
         }
         .chip-hint {
           text-align: center;
-          font-size: 11px;
+          font-size: 10px;
           color: #9a8a76;
-          margin: 0 0 8px;
+          margin: 0 0 6px;
           letter-spacing: 0.3px;
         }
         .experience-tracker-title {
@@ -610,20 +610,20 @@ END:VCARD`;
           letter-spacing: 2px;
           color: #635345;
           text-transform: uppercase;
-          margin: 0 0 8px;
+          margin: 0 0 6px;
         }
         .floating-pills-cloud {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
-          gap: 5px;
-          margin: 0 auto 8px;
+          gap: 4px;
+          margin: 0 auto 6px;
           width: 100%;
         }
         .embossed-pill {
           border-radius: 999px;
-          padding: 5px 11px;
-          font-size: 11.5px;
+          padding: 4px 9px;
+          font-size: 10.5px;
           background: #ffffff;
           color: #591016;
           border: 1px solid #ebd9c3;
@@ -646,7 +646,7 @@ END:VCARD`;
           border-radius: 999px;
           padding: 3px;
           gap: 2px;
-          margin: 0 auto 12px;
+          margin: 0 auto 10px;
           box-shadow: 0 3px 10px rgba(180, 155, 130, 0.12);
           border: 1px solid #ebd9c3;
         }
@@ -668,11 +668,11 @@ END:VCARD`;
         .signature-review-box {
           width: 100%;
           background: #ffffff;
-          border-radius: 24px;
-          padding: 18px;
+          border-radius: 20px;
+          padding: 12px 14px 12px;
           box-sizing: border-box;
-          box-shadow: 0 14px 34px rgba(160, 130, 100, 0.13);
-          margin-bottom: 16px;
+          box-shadow: 0 8px 24px rgba(160, 130, 100, 0.12);
+          margin-bottom: 12px;
           text-align: left;
           border-top: 4px solid #6e151d;
           color: #2b2016;
@@ -681,7 +681,7 @@ END:VCARD`;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 10px;
+          margin-bottom: 4px;
         }
         .label-badge {
           display: inline-flex;
@@ -716,11 +716,11 @@ END:VCARD`;
           transform: scale(0.95);
         }
         .review-display-zone {
-          min-height: 132px;
+          min-height: 84px;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 4px 2px 8px;
+          padding: 2px 2px 4px;
         }
         .loader-shimmer-wrap {
           color: #b78a48;
@@ -729,8 +729,8 @@ END:VCARD`;
         }
         .review-body-text {
           font-family: Georgia, serif;
-          font-size: 14.5px;
-          line-height: 1.6;
+          font-size: 13.5px;
+          line-height: 1.55;
           color: #2b2016;
           margin: 0;
           width: 100%;
@@ -764,12 +764,12 @@ END:VCARD`;
         .card-ornament-center {
           text-align: center;
           color: #d1b183;
-          font-size: 7px;
-          margin: 6px 0 10px;
+          font-size: 6px;
+          margin: 2px 0 8px;
         }
         .full-luxury-copy-btn {
           width: 100%;
-          height: 50px;
+          height: 42px;
           border-radius: 999px;
           background: linear-gradient(180deg, #781a23 0%, #5c1218 100%);
           border: none;
@@ -777,7 +777,7 @@ END:VCARD`;
           font-size: 12px;
           font-weight: 750;
           cursor: pointer;
-          box-shadow: 0 8px 22px rgba(110, 20, 30, 0.32);
+          box-shadow: 0 6px 16px rgba(110, 20, 30, 0.28);
           transition: transform 0.15s ease;
         }
         .full-luxury-copy-btn:disabled {
@@ -791,7 +791,7 @@ END:VCARD`;
           font-size: 9.5px;
           color: #9c8e80;
           text-align: center;
-          margin: 8px 0 0;
+          margin: 6px 0 0;
           font-style: italic;
         }
         .quick-actions-card {
