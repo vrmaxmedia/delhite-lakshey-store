@@ -459,7 +459,7 @@ END:VCARD`;
             type="button"
             disabled={loading || isTyping || !reviewDraft}
             onClick={handleCopyAndRedirect}
-            className="full-luxury-copy-btn"
+            className={`full-luxury-copy-btn ${copied ? "copied" : ""}`}
           >
             <span>
               {copied
@@ -821,12 +821,12 @@ END:VCARD`;
           transform: scale(0.97);
         }
 
-        /* Muted maroon active state, no strong glow */
+        /* Dark maroon selected chip */
         .embossed-pill.active {
-          background: #89535a;
+          background: #751522;
           color: #ffffff;
-          border-color: #89535a;
-          box-shadow: 0 2px 6px rgba(105, 62, 68, 0.12);
+          border-color: #751522;
+          box-shadow: 0 2px 6px rgba(117, 21, 34, 0.18);
         }
 
         .capsule-lang-dock {
@@ -851,10 +851,11 @@ END:VCARD`;
           cursor: pointer;
         }
 
+        /* Dark maroon selected language */
         .capsule-lang-btn.active {
-          background: #89535a;
+          background: #751522;
           color: #ffffff;
-          box-shadow: 0 2px 6px rgba(105, 62, 68, 0.15);
+          box-shadow: 0 2px 6px rgba(117, 21, 34, 0.18);
         }
 
         .signature-review-box {
@@ -984,7 +985,13 @@ END:VCARD`;
           font-weight: 750;
           cursor: pointer;
           box-shadow: 0 5px 14px rgba(105, 62, 68, 0.19);
-          transition: transform 0.15s ease;
+          transition: transform 0.15s ease, background 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        /* Dark maroon only after successful copy */
+        .full-luxury-copy-btn.copied {
+          background: #751522;
+          box-shadow: 0 5px 14px rgba(117, 21, 34, 0.22);
         }
 
         .full-luxury-copy-btn:disabled {
