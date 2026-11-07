@@ -20,15 +20,11 @@ const CLIENT_CONFIG = {
   facebookUrl: "https://www.facebook.com/share/1Er7t9KgYH/",
   youtubeUrl: "https://youtube.com/@delhitelakshay9670?si=EhvBiMvHNuvuoYtD",
   whatsappChannelUrl: "https://whatsapp.com/channel/0029Va5ABfF4IBhEZhHx2N3w",
-
-  // VR Max AI (agency) contact
   agencyName: "VR Max AI",
   agencyWhatsapp: "918700660097",
   agencyPhoneDisplay: "+91 87006 60097",
-
   customInstruction:
     "You are an authentic local customer writing an unscripted Google Maps review for Delhite Lakshay Store in GTB Nagar, Delhi. Write like a real human speaking straight from the heart. NEVER use wholesale in a bulk-selling way; instead talk about getting unbeatable market-best retail prices after checking 10 places. Mention random specific iPhone models organically (e.g. iPhone 15 Pro, iPhone 14, iPhone 16, 13, etc.). Strictly DO NOT use full stops (.) at the end of sentences. Vary lengths completely randomly (some 1-line quick reviews, some 2-line, some 3-4 lines detailed). Never use robotic or repetitive openings.",
-
   chips: [
     { label: "All", context: "overall store experience" },
     { label: "Refurbished", context: "refurbished iPhone that looks and works like new" },
@@ -62,16 +58,20 @@ function useTypewriter(fullText, totalMs = 2300) {
       setIsTyping(false);
       return;
     }
+
     setDisplayText("");
     setIsTyping(true);
 
-    // Har akshar ka time: chhota review thoda dheere, lamba thoda tez (total ~2.3 sec)
-    // Comma par halka sa pause, taaki insaan jaisa likha hua lage
     const COMMA_PAUSE = 90;
     const commas = (fullText.match(/,/g) || []).length;
-    const base = Math.min(26, Math.max(10, (totalMs - commas * COMMA_PAUSE) / fullText.length));
+    const base = Math.min(
+      26,
+      Math.max(10, (totalMs - commas * COMMA_PAUSE) / fullText.length)
+    );
+
     const times = [];
     let t = 0;
+
     for (let i = 0; i < fullText.length; i++) {
       t += base;
       times.push(t);
@@ -80,17 +80,22 @@ function useTypewriter(fullText, totalMs = 2300) {
 
     const start = performance.now();
     let raf;
+
     const tick = (now) => {
       const elapsed = now - start;
       let n = 0;
+
       while (n < times.length && times[n] <= elapsed) n++;
+
       setDisplayText(fullText.slice(0, n));
+
       if (n >= fullText.length) {
         setIsTyping(false);
       } else {
         raf = requestAnimationFrame(tick);
       }
     };
+
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [fullText, totalMs]);
@@ -105,8 +110,9 @@ async function copyToClipboard(text) {
       return true;
     }
   } catch (e) {
-    // fallback neeche
+    // Fallback below
   }
+
   try {
     const ta = document.createElement("textarea");
     ta.value = text;
@@ -141,6 +147,7 @@ export default function UniversalReviewPage() {
 
   useEffect(() => {
     setMounted(true);
+
     return () => {
       requestIdRef.current++;
       abortControllerRef.current?.abort();
@@ -149,6 +156,7 @@ export default function UniversalReviewPage() {
 
   const generateAIReview = useCallback(async (labels, lang) => {
     abortControllerRef.current?.abort();
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
     const requestId = ++requestIdRef.current;
@@ -183,53 +191,77 @@ export default function UniversalReviewPage() {
       });
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `Draft generation failed (${res.status}).`);
-      if (!data.review?.trim()) throw new Error("The API returned an empty draft.");
+
+      if (!res.ok) {
+        throw new Error(data.error || `Draft generation failed (${res.status}).`);
+      }
+
+      if (!data.review?.trim()) {
+        throw new Error("The API returned an empty draft.");
+      }
+
       if (requestId !== requestIdRef.current) return;
 
       if (data.meta) {
-        recentLengthsRef.current = [...recentLengthsRef.current, data.meta].slice(-6);
+        recentLengthsRef.current = [
+          ...recentLengthsRef.current,
+          data.meta,
+        ].slice(-6);
       }
+
       setReviewDraft(data.review.trim());
     } catch (err) {
       if (err.name === "AbortError") return;
+
       if (requestId === requestIdRef.current) {
         setError(err.message || "Unable to generate a draft.");
       }
     } finally {
-      if (requestId === requestIdRef.current) setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
-    // Chips jaldi-jaldi dabane par har tap par Gemini call na ho, isliye thoda ruk kar
+
     const delay = firstRunRef.current ? 0 : 350;
     firstRunRef.current = false;
-    const t = setTimeout(() => generateAIReview(selectedLabels, language), delay);
+
+    const t = setTimeout(
+      () => generateAIReview(selectedLabels, language),
+      delay
+    );
+
     return () => {
       clearTimeout(t);
       abortControllerRef.current?.abort();
     };
   }, [mounted, selectedLabels, language, generateAIReview]);
 
-  // Chips = keywords. 3 tak chun sakte hain. "All" akela chalta hai.
   function handleChipChange(chipObj) {
     if (chipObj.label === "All") {
-      if (selectedLabels.length === 1 && selectedLabels[0] === "All") {
+      if (
+        selectedLabels.length === 1 &&
+        selectedLabels[0] === "All"
+      ) {
         generateAIReview(["All"], language);
       } else {
         setSelectedLabels(["All"]);
       }
       return;
     }
+
     let next = selectedLabels.filter((l) => l !== "All");
+
     if (next.includes(chipObj.label)) {
       next = next.filter((l) => l !== chipObj.label);
     } else {
       next = [...next, chipObj.label];
       if (next.length > 3) next = next.slice(-3);
     }
+
     setSelectedLabels(next.length ? next : ["All"]);
   }
 
@@ -238,17 +270,22 @@ export default function UniversalReviewPage() {
       generateAIReview(selectedLabels, lang);
       return;
     }
+
     setLanguage(lang);
   }
 
   async function handleCopyAndRedirect() {
     if (!reviewDraft || loading || isTyping) return;
+
     const ok = await copyToClipboard(reviewDraft);
+
     if (!ok) {
       setError("Could not copy the draft. Please select and copy it manually.");
       return;
     }
+
     setCopied(true);
+
     setTimeout(() => {
       window.location.href = CLIENT_CONFIG.googleReviewUrl;
     }, 550);
@@ -264,18 +301,32 @@ ADR;TYPE=WORK:;;${CLIENT_CONFIG.fullAddress};;;;
 NOTE:${CLIENT_CONFIG.subHeading}
 END:VCARD`;
 
-    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8;" });
+    const blob = new Blob([vcard], {
+      type: "text/vcard;charset=utf-8;",
+    });
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+
     link.href = url;
     link.download = `${CLIENT_CONFIG.businessName.replace(/\s+/g, "_")}.vcf`;
+
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
   }
 
-  if (!mounted) return <div style={{ minHeight: "100vh", backgroundColor: "#fbf9f4" }} />;
+  if (!mounted) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#faf8f3",
+        }}
+      />
+    );
+  }
 
   return (
     <main className="soft-luxury-viewport">
@@ -284,14 +335,21 @@ END:VCARD`;
         <div className="brand-medallion-badge">
           <div
             className="logo-circle-container"
-            style={{ backgroundImage: `url(${CLIENT_CONFIG.logoUrl})` }}
+            style={{
+              backgroundImage: `url(${CLIENT_CONFIG.logoUrl})`,
+            }}
             role="img"
             aria-label={`${CLIENT_CONFIG.businessName} logo`}
           ></div>
-          <h1 className="brand-main-title">{CLIENT_CONFIG.businessName}</h1>
+
+          <h1 className="brand-main-title">
+            {CLIENT_CONFIG.businessName}
+          </h1>
         </div>
 
-        <p className="brand-serif-subtitle">{CLIENT_CONFIG.subHeading}</p>
+        <p className="brand-serif-subtitle">
+          {CLIENT_CONFIG.subHeading}
+        </p>
 
         <div className="royal-shahi-divider">
           <span className="divider-line"></span>
@@ -300,15 +358,22 @@ END:VCARD`;
         </div>
 
         <div className="stars-cluster" aria-hidden="true">
-          <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
+          <span>★</span>
         </div>
 
-        <p className="experience-tracker-title">SHARE YOUR EXPERIENCE</p>
+        <p className="experience-tracker-title">
+          SHARE YOUR EXPERIENCE
+        </p>
 
         {/* Filter Chips */}
         <div className="floating-pills-cloud">
           {CLIENT_CONFIG.chips.map((chip) => {
             const active = selectedLabels.includes(chip.label);
+
             return (
               <button
                 key={chip.label}
@@ -322,12 +387,15 @@ END:VCARD`;
           })}
         </div>
 
-        <p className="chip-hint">Tap up to 3 keywords for your review</p>
+        <p className="chip-hint">
+          Tap up to 3 keywords for your review
+        </p>
 
         {/* Language Selector */}
         <div className="capsule-lang-dock">
           {["ENGLISH", "HINGLISH"].map((lang) => {
             const active = language === lang;
+
             return (
               <button
                 key={lang}
@@ -348,6 +416,7 @@ END:VCARD`;
               <span className="dot-ping"></span>
               YOUR REVIEW
             </div>
+
             <button
               type="button"
               disabled={loading || isTyping}
@@ -362,21 +431,29 @@ END:VCARD`;
             {loading ? (
               <div className="loader-shimmer-wrap">
                 <span className="sparkle-icon">✦</span>
-                <span className="shimmer-text"> Crafting authentic review...</span>
+                <span className="shimmer-text">
+                  Crafting authentic review...
+                </span>
               </div>
             ) : error ? (
               <p className="review-error">{error}</p>
             ) : reviewDraft ? (
               <p className="review-body-text">
                 {displayText}
-                {isTyping && <span className="typewriter-cursor"></span>}
+                {isTyping && (
+                  <span className="typewriter-cursor"></span>
+                )}
               </p>
             ) : (
-              <p className="review-placeholder">Your review draft will appear here.</p>
+              <p className="review-placeholder">
+                Your review draft will appear here.
+              </p>
             )}
           </div>
 
-          <div className="card-ornament-center"><span>◆</span></div>
+          <div className="card-ornament-center">
+            <span>◆</span>
+          </div>
 
           <button
             type="button"
@@ -384,9 +461,16 @@ END:VCARD`;
             onClick={handleCopyAndRedirect}
             className="full-luxury-copy-btn"
           >
-            <span>{copied ? "Copied! Opening Google..." : "Copy & Paste on Google"}</span>
+            <span>
+              {copied
+                ? "Copied! Opening Google..."
+                : "Copy & Paste on Google"}
+            </span>
           </button>
-          <p className="card-disclaimer-note">Please review the wording before posting.</p>
+
+          <p className="card-disclaimer-note">
+            Please review the wording before posting.
+          </p>
         </div>
 
         {/* Quick Actions */}
@@ -394,9 +478,16 @@ END:VCARD`;
           <div className="soft-action-grid">
             <div className="action-row-upper">
               {/* WhatsApp */}
-              <a href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={`https://wa.me/${CLIENT_CONFIG.cleanPhone}`}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc whatsapp-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
                 </div>
                 <span className="icon-tag">WhatsApp</span>
               </a>
@@ -404,23 +495,42 @@ END:VCARD`;
               {/* Call Us */}
               <a href={`tel:${CLIENT_CONFIG.phone}`} className="soft-circle-action">
                 <div className="icon-disc call-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Call Us</span>
               </a>
 
               {/* Save Contact */}
-              <button type="button" onClick={handleSaveContact} className="soft-circle-action">
+              <button
+                type="button"
+                onClick={handleSaveContact}
+                className="soft-circle-action"
+              >
                 <div className="icon-disc contact-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Save Contact</span>
               </button>
 
               {/* Directions */}
-              <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.mapsDirectionUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc map-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Directions</span>
               </a>
@@ -428,33 +538,64 @@ END:VCARD`;
 
             <div className="action-row-lower">
               {/* Instagram */}
-              <a href={CLIENT_CONFIG.instagramUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.instagramUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc insta-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Instagram</span>
               </a>
 
               {/* WhatsApp Channel */}
-              <a href={CLIENT_CONFIG.whatsappChannelUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.whatsappChannelUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc wa-channel-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
                 </div>
                 <span className="icon-tag">WA Channel</span>
               </a>
 
               {/* Facebook */}
-              <a href={CLIENT_CONFIG.facebookUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.facebookUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc fb-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
                 </div>
                 <span className="icon-tag">Facebook</span>
               </a>
 
               {/* YouTube */}
-              <a href={CLIENT_CONFIG.youtubeUrl} target="_blank" rel="noreferrer" className="soft-circle-action">
+              <a
+                href={CLIENT_CONFIG.youtubeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="soft-circle-action"
+              >
                 <div className="icon-disc yt-disc">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+                    <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="currentColor" />
+                  </svg>
                 </div>
                 <span className="icon-tag">YouTube</span>
               </a>
@@ -464,14 +605,23 @@ END:VCARD`;
 
         {/* Map Card */}
         <div className="embedded-map-card">
-          <a href={CLIENT_CONFIG.mapsDirectionUrl} target="_blank" rel="noreferrer" className="map-card-header-link">
+          <a
+            href={CLIENT_CONFIG.mapsDirectionUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="map-card-header-link"
+          >
             <div className="address-highlight-box">
-              <p className="agency-clean-address"><strong>📍 Address:</strong> {CLIENT_CONFIG.fullAddress}</p>
+              <p className="agency-clean-address">
+                <strong>📍 Address:</strong> {CLIENT_CONFIG.fullAddress}
+              </p>
             </div>
+
             <div className="map-card-header">
               <span>Visit Store • GTB Nagar, Delhi</span>
             </div>
           </a>
+
           <div className="map-iframe-container">
             <iframe
               title="Delhite Lakshay Store Location"
@@ -484,6 +634,7 @@ END:VCARD`;
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
+
           <a
             href={CLIENT_CONFIG.mapsDirectionUrl}
             target="_blank"
@@ -508,17 +659,23 @@ END:VCARD`;
       </div>
 
       <style jsx global>{`
+        /* =========================================
+           SOFT LUXURY COLOR SYSTEM
+           Layout and dimensions preserved
+           ========================================= */
+
         .soft-luxury-viewport {
           min-height: 100vh;
-          background: #fbf9f4;
+          background: #faf8f3;
           padding: 10px 16px 24px;
           box-sizing: border-box;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          color: #2b2016;
+          color: #493d35;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
+
         .main-content-flow {
           width: 100%;
           max-width: 410px;
@@ -527,6 +684,7 @@ END:VCARD`;
           align-items: center;
           text-align: center;
         }
+
         .brand-medallion-badge {
           margin-top: 2px;
           margin-bottom: 2px;
@@ -534,6 +692,7 @@ END:VCARD`;
           flex-direction: column;
           align-items: center;
         }
+
         .logo-circle-container {
           width: 98px;
           height: 98px;
@@ -542,37 +701,45 @@ END:VCARD`;
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;
-          box-shadow: 0 14px 34px rgba(110, 21, 29, 0.25), 0 6px 14px rgba(0,0,0,0.12);
+          box-shadow:
+            0 10px 25px rgba(91, 65, 50, 0.13),
+            0 3px 9px rgba(91, 65, 50, 0.07);
           margin-bottom: 8px;
           animation: floatLogo 3.5s ease-in-out infinite;
-          border: 3px solid #d1b183;
+          border: 3px solid #d8c4a2;
           transition: transform 0.2s ease;
         }
+
         .logo-circle-container:active {
           transform: scale(0.96);
         }
+
         @keyframes floatLogo {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-6px); }
         }
+
         @media (prefers-reduced-motion: reduce) {
           .logo-circle-container { animation: none; }
         }
+
         .brand-main-title {
           font-family: Georgia, serif;
           font-size: 23px;
           font-weight: 800;
-          color: #591016;
+          color: #63343a;
           margin: 0 0 4px;
           letter-spacing: 0.3px;
         }
+
         .brand-serif-subtitle {
           font-family: Georgia, serif;
           font-style: italic;
           font-size: 12.5px;
-          color: #b78a48;
+          color: #a98b60;
           margin: 0 0 4px;
         }
+
         .royal-shahi-divider {
           display: flex;
           align-items: center;
@@ -581,37 +748,48 @@ END:VCARD`;
           margin: 4px auto 8px;
           gap: 10px;
         }
+
         .divider-line {
           flex: 1;
           height: 1px;
-          background: linear-gradient(90deg, transparent, #d1b183, transparent);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            #d9c9b1,
+            transparent
+          );
         }
+
         .divider-gem {
-          color: #b78a48;
+          color: #b69a70;
           font-size: 8px;
         }
+
         .stars-cluster {
           display: flex;
           gap: 4px;
-          color: #d19a3b;
+          color: #c3a16b;
           font-size: 14px;
           margin-bottom: 2px;
         }
+
         .chip-hint {
           text-align: center;
           font-size: 11px;
-          color: #9a8a76;
+          color: #a39789;
           margin: 0 0 8px;
           letter-spacing: 0.3px;
         }
+
         .experience-tracker-title {
           font-size: 9px;
           font-weight: 800;
           letter-spacing: 2px;
-          color: #635345;
+          color: #75675c;
           text-transform: uppercase;
           margin: 0 0 8px;
         }
+
         .floating-pills-cloud {
           display: flex;
           flex-wrap: wrap;
@@ -620,36 +798,48 @@ END:VCARD`;
           margin: 0 auto 8px;
           width: 100%;
         }
+
+        /* Soft, flat chips */
         .embossed-pill {
           border-radius: 999px;
           padding: 5px 11px;
           font-size: 11.5px;
-          background: #ffffff;
-          color: #591016;
-          border: 1px solid #ebd9c3;
+          background: #fdfbf8;
+          color: #725b56;
+          border: 1px solid #e9dfd2;
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(180, 155, 130, 0.08);
-          transition: all 0.16s ease;
+          box-shadow: 0 1px 3px rgba(91, 65, 50, 0.035);
+          transition:
+            background 0.18s ease,
+            color 0.18s ease,
+            border-color 0.18s ease,
+            box-shadow 0.18s ease,
+            transform 0.16s ease;
         }
+
         .embossed-pill:active {
-          transform: scale(0.95);
+          transform: scale(0.97);
         }
+
+        /* Muted maroon active state, no strong glow */
         .embossed-pill.active {
-          background: radial-gradient(circle at 30% 30%, #831d27 0%, #591016 100%);
+          background: #89535a;
           color: #ffffff;
-          border-color: #591016;
-          box-shadow: 0 4px 14px rgba(110, 20, 30, 0.25);
+          border-color: #89535a;
+          box-shadow: 0 2px 6px rgba(105, 62, 68, 0.12);
         }
+
         .capsule-lang-dock {
           display: inline-flex;
-          background: #ffffff;
+          background: #fdfbf8;
           border-radius: 999px;
           padding: 3px;
           gap: 2px;
           margin: 0 auto 12px;
-          box-shadow: 0 3px 10px rgba(180, 155, 130, 0.12);
-          border: 1px solid #ebd9c3;
+          box-shadow: 0 2px 7px rgba(91, 65, 50, 0.055);
+          border: 1px solid #e9dfd2;
         }
+
         .capsule-lang-btn {
           padding: 5px 18px;
           border-radius: 999px;
@@ -657,32 +847,36 @@ END:VCARD`;
           background: transparent;
           font-size: 10px;
           font-weight: 700;
-          color: #7b6b5d;
+          color: #85766a;
           cursor: pointer;
         }
+
         .capsule-lang-btn.active {
-          background: #6e151d;
+          background: #89535a;
           color: #ffffff;
-          box-shadow: 0 3px 8px rgba(110, 21, 29, 0.28);
+          box-shadow: 0 2px 6px rgba(105, 62, 68, 0.15);
         }
+
         .signature-review-box {
           width: 100%;
-          background: #ffffff;
+          background: #fffefa;
           border-radius: 24px;
           padding: 18px;
           box-sizing: border-box;
-          box-shadow: 0 14px 34px rgba(160, 130, 100, 0.13);
+          box-shadow: 0 9px 24px rgba(91, 65, 50, 0.075);
           margin-bottom: 16px;
           text-align: left;
-          border-top: 4px solid #6e151d;
-          color: #2b2016;
+          border-top: 4px solid #89535a;
+          color: #493d35;
         }
+
         .box-top-ribbon {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 10px;
         }
+
         .label-badge {
           display: inline-flex;
           align-items: center;
@@ -690,31 +884,35 @@ END:VCARD`;
           font-size: 8.5px;
           font-weight: 800;
           letter-spacing: 1.8px;
-          color: #9c8e80;
+          color: #a19689;
           text-transform: uppercase;
         }
+
         .dot-ping {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #6e151d;
+          background: #98656b;
         }
+
         .top-rewrite-btn {
           display: inline-flex;
           align-items: center;
           padding: 4px 10px;
           border-radius: 999px;
-          background: #fbf7f1;
-          border: 1px solid #ebd9c3;
-          color: #6e151d;
+          background: #faf7f1;
+          border: 1px solid #e9dfd2;
+          color: #80535a;
           font-size: 10.5px;
           font-weight: 650;
           cursor: pointer;
           transition: transform 0.15s ease;
         }
+
         .top-rewrite-btn:active {
           transform: scale(0.95);
         }
+
         .review-display-zone {
           min-height: 132px;
           display: flex;
@@ -722,88 +920,101 @@ END:VCARD`;
           justify-content: center;
           padding: 4px 2px 8px;
         }
+
         .loader-shimmer-wrap {
-          color: #b78a48;
+          color: #aa8e66;
           font-size: 12px;
           font-style: italic;
         }
+
         .review-body-text {
           font-family: Georgia, serif;
           font-size: 14.5px;
           line-height: 1.6;
-          color: #2b2016;
+          color: #403630;
           margin: 0;
           width: 100%;
           white-space: pre-wrap;
         }
+
         .review-placeholder {
           font-family: Georgia, serif;
           font-size: 13px;
           font-style: italic;
-          color: #a49688;
+          color: #aaa094;
           margin: 0;
         }
+
         .review-error {
           font-size: 12px;
-          color: #a3212d;
+          color: #a45c62;
           margin: 0;
         }
+
         .typewriter-cursor {
           display: inline-block;
           width: 2px;
           height: 13px;
-          background: #6e151d;
+          background: #89535a;
           margin-left: 3px;
           vertical-align: middle;
           animation: blink 0.7s infinite;
         }
+
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
+
         .card-ornament-center {
           text-align: center;
-          color: #d1b183;
+          color: #c9b28e;
           font-size: 7px;
           margin: 6px 0 10px;
         }
+
         .full-luxury-copy-btn {
           width: 100%;
           height: 50px;
           border-radius: 999px;
-          background: linear-gradient(180deg, #781a23 0%, #5c1218 100%);
+          background: linear-gradient(180deg, #95636a 0%, #805159 100%);
           border: none;
           color: #ffffff;
           font-size: 12px;
           font-weight: 750;
           cursor: pointer;
-          box-shadow: 0 8px 22px rgba(110, 20, 30, 0.32);
+          box-shadow: 0 5px 14px rgba(105, 62, 68, 0.19);
           transition: transform 0.15s ease;
         }
+
         .full-luxury-copy-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
+
         .full-luxury-copy-btn:active:not(:disabled) {
           transform: scale(0.98);
         }
+
         .card-disclaimer-note {
           font-size: 9.5px;
-          color: #9c8e80;
+          color: #a49a8f;
           text-align: center;
           margin: 8px 0 0;
           font-style: italic;
         }
+
         .quick-actions-card {
           width: 100%;
-          background: #ffffff;
+          background: #fffefa;
           border-radius: 22px;
           padding: 18px 12px;
           box-sizing: border-box;
-          border: 1px solid #ebd9c3;
-          box-shadow: 0 10px 28px rgba(160, 130, 100, 0.14);
+          border: 1px solid #eae1d6;
+          box-shadow: 0 7px 20px rgba(91, 65, 50, 0.065);
           margin-bottom: 16px;
         }
+
         .soft-action-grid {
           display: flex;
           flex-direction: column;
@@ -811,64 +1022,75 @@ END:VCARD`;
           gap: 16px;
           width: 100%;
         }
+
         .action-row-upper {
           display: flex;
           justify-content: center;
           gap: 14px;
           width: 100%;
         }
+
         .action-row-lower {
           display: flex;
           justify-content: center;
           gap: 14px;
           width: 100%;
         }
+
         .soft-circle-action {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 5px;
           text-decoration: none !important;
-          color: #4a3c30;
+          color: #66564b;
           background: transparent;
           border: none;
           cursor: pointer;
           padding: 0;
           transition: transform 0.15s ease;
         }
+
         .soft-circle-action:active {
           transform: scale(0.92);
         }
+
         .icon-disc {
           width: 50px;
           height: 50px;
           border-radius: 50%;
-          background: #fbf7f1;
+          background: #faf7f1;
           display: grid;
           place-items: center;
-          box-shadow: 0 6px 16px rgba(180, 150, 120, 0.15);
-          border: 1px solid #ebd9c3;
+          box-shadow: 0 3px 9px rgba(91, 65, 50, 0.075);
+          border: 1px solid #e9dfd2;
           transition: all 0.2s ease;
         }
+
         .icon-disc svg {
           width: 20px;
           height: 20px;
-          stroke: #591016;
+          stroke: #80535a;
           transition: stroke 0.2s ease;
         }
+
         .whatsapp-disc:hover { background: #25d366; border-color: #25d366; }
         .whatsapp-disc:hover svg { stroke: #ffffff; }
 
         .call-disc:hover { background: #007aff; border-color: #007aff; }
         .call-disc:hover svg { stroke: #ffffff; }
 
-        .contact-disc:hover { background: #591016; border-color: #591016; }
+        .contact-disc:hover { background: #80535a; border-color: #80535a; }
         .contact-disc:hover svg { stroke: #ffffff; }
 
         .map-disc:hover { background: #ea4335; border-color: #ea4335; }
         .map-disc:hover svg { stroke: #ffffff; }
 
-        .insta-disc:hover { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); border-color: transparent; }
+        .insta-disc:hover {
+          background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+          border-color: transparent;
+        }
+
         .insta-disc:hover svg { stroke: #ffffff; }
 
         .wa-channel-disc:hover { background: #25d366; border-color: #25d366; }
@@ -883,22 +1105,25 @@ END:VCARD`;
         .icon-tag {
           font-size: 9.5px;
           font-weight: 700;
-          color: #4a3c30;
+          color: #66564b;
         }
+
         .embedded-map-card {
           width: 100%;
-          background: #ffffff;
+          background: #fffefa;
           border-radius: 22px;
           padding: 14px 16px;
           box-sizing: border-box;
-          border: 1px solid #ebd9c3;
-          box-shadow: 0 8px 24px rgba(160, 130, 100, 0.1);
+          border: 1px solid #eae1d6;
+          box-shadow: 0 6px 18px rgba(91, 65, 50, 0.055);
           margin-bottom: 12px;
           text-align: left;
         }
+
         .map-card-header-link {
           text-decoration: none;
         }
+
         .map-card-header {
           display: flex;
           align-items: center;
@@ -906,47 +1131,52 @@ END:VCARD`;
           gap: 6px;
           font-size: 11.5px;
           font-weight: 800;
-          color: #591016;
+          color: #80535a;
           margin-bottom: 8px;
         }
+
         .map-iframe-container {
           width: 100%;
           border-radius: 14px;
           overflow: hidden;
-          border: 1px solid #ebd9c3;
+          border: 1px solid #e9dfd2;
           margin-bottom: 8px;
         }
+
         .map-directions-link {
           font-size: 11px;
           font-weight: 750;
-          color: #b78a48;
+          color: #a88a61;
           text-decoration: none;
           display: block;
           text-align: center;
           margin-bottom: 8px;
         }
+
         .address-highlight-box {
-          background: #fbf7f1;
+          background: #faf7f1;
           border-radius: 12px;
           padding: 10px 12px;
-          border: 1px solid #ebd9c3;
+          border: 1px solid #e9dfd2;
           margin-bottom: 8px;
         }
+
         .agency-clean-address {
           font-size: 10.5px;
-          color: #554435;
+          color: #65564a;
           margin: 0;
           line-height: 1.4;
           text-align: center;
         }
 
-        /* ---------- Mini Footer ---------- */
+        /* Mini Footer */
         .mini-footer {
           width: 100%;
           display: flex;
           justify-content: center;
           margin-top: 2px;
         }
+
         .mini-footer-pill {
           display: inline-flex;
           align-items: center;
@@ -954,23 +1184,26 @@ END:VCARD`;
           flex-wrap: wrap;
           gap: 4px;
           padding: 5px 12px;
-          border: 1px solid #ebd9c3;
+          border: 1px solid #e9dfd2;
           border-radius: 999px;
-          background: #ffffff;
+          background: #fffefa;
           font-size: 8.5px;
           letter-spacing: 0.3px;
-          color: #9c8e80;
+          color: #a19689;
           line-height: 1.4;
         }
+
         .mini-footer-pill strong {
-          color: #7b1c24;
+          color: #80535a;
           font-weight: 700;
         }
+
         .mini-footer-dot {
-          color: #d1b183;
+          color: #c9b28e;
         }
+
         .mini-footer-pill a {
-          color: #7b1c24;
+          color: #80535a;
           font-weight: 700;
           text-decoration: none;
         }
